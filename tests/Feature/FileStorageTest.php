@@ -1,5 +1,7 @@
 <?php
 
+namespace Securepoint\TokenBucket\Tests\Feature;
+
 use Securepoint\TokenBucket\Storage\StorageException;
 use phpmock\phpunit\PHPMock;
 use org\bovigo\vfs\vfsStream;

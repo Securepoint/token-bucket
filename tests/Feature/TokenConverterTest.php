@@ -1,5 +1,7 @@
 <?php
 
+namespace Securepoint\TokenBucket\Tests\Feature;
+
 use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

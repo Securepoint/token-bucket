@@ -1,5 +1,7 @@
 <?php
 
+namespace Securepoint\TokenBucket\Tests;
+
 use PHPUnit\Framework\Attributes\DataProvider;
 use LengthException;
 use malkusch\lock\mutex\NoMutex;

@@ -1,5 +1,7 @@
 <?php
 
+namespace Securepoint\TokenBucket\Tests\Feature;
+
 use PHPUnit\Framework\Attributes\DataProvider;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;

@@ -20,7 +20,10 @@
         }
     ],
     "autoload": {
-        "psr-4": {"Securepoint\\TokenBucket\\": "src/"}
+        "psr-4": {
+            "Securepoint\\TokenBucket\\": "src/",
+            "Securepoint\\TokenBucket\\Tests\\": "tests/"
+        }
     },
     "require": {
         "php": "^8.1",

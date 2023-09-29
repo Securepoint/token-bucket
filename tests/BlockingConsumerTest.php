@@ -1,5 +1,7 @@
 <?php
 
+namespace Securepoint\TokenBucket\Tests;
+
 use PHPUnit\Framework\Attributes\DataProvider;
 use Securepoint\TokenBucket\TimeoutException;
 use phpmock\environment\SleepEnvironmentBuilder;

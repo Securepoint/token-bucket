@@ -1,5 +1,7 @@
 <?php
 
+namespace Securepoint\TokenBucket\Tests\Feature;
+
 use Securepoint\TokenBucket\Storage\StorageException;
 use PHPUnit\Framework\TestCase;
 use Securepoint\TokenBucket\Storage\IPCStorage;
