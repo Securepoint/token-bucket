@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Securepoint\TokenBucket\Storage;
 
 use InvalidArgumentException;
+use malkusch\lock\mutex\Mutex;
 use malkusch\lock\mutex\SemaphoreMutex;
 use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
 use Securepoint\TokenBucket\Util\DoublePacker;
