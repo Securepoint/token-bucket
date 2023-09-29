@@ -8,7 +8,7 @@ use phpmock\environment\MockEnvironment;
 use phpmock\environment\SleepEnvironmentBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Secuepoint\TokenBucket\BlockingConsumer;
+use Securepoint\TokenBucket\BlockingConsumer;
 use Securepoint\TokenBucket\Rate;
 use Securepoint\TokenBucket\Storage\SingleProcessStorage;
 use Securepoint\TokenBucket\TimeoutException;
