@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Tests\Feature;
 
-use Securepoint\TokenBucket\Storage\StorageException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Predis\Client;
 use Predis\ClientException;
 use Securepoint\TokenBucket\Storage\PredisStorage;
+use Securepoint\TokenBucket\Storage\StorageException;
 
 /**
  * Tests for PredisStorage.
@@ -21,7 +23,6 @@ use Securepoint\TokenBucket\Storage\PredisStorage;
  */
 class PredisStorageTest extends TestCase
 {
-
     /**
      * @var Client The API.
      */
@@ -31,32 +32,32 @@ class PredisStorageTest extends TestCase
      * @var PredisStorage The SUT.
      */
     private $storage;
-    
+
     protected function setUp(): void
     {
         parent::setUp();
-        
-        if (!getenv("REDIS_URI")) {
+
+        if (! getenv('REDIS_URI')) {
             $this->markTestSkipped();
         }
-        $this->redis   = new Client(getenv("REDIS_URI"));
-        $this->storage = new PredisStorage("test", $this->redis);
+        $this->redis = new Client(getenv('REDIS_URI'));
+        $this->storage = new PredisStorage('test', $this->redis);
     }
-    
+
     /**
      * Tests broken server communication.
      *
      * @param callable $method The tested method.
-     * @test
      */
     #[DataProvider('provideTestBrokenCommunication')]
     public function testBrokenCommunication(callable $method)
     {
         $this->expectException(StorageException::class);
         $redis = $this->createMock(Client::class);
-        $redis->expects($this->once())->method("__call")
-                ->willThrowException(new ClientException());
-        $storage = new PredisStorage("test", $redis);
+        $redis->expects($this->once())
+            ->method('__call')
+            ->willThrowException(new ClientException());
+        $storage = new PredisStorage('test', $redis);
         call_user_func($method, $storage);
     }
 
@@ -85,11 +86,9 @@ class PredisStorageTest extends TestCase
             }],
         ];
     }
-    
+
     /**
      * Tests remove() fails.
-     *
-     * @test
      */
     public function testRemoveFails()
     {
@@ -99,27 +98,24 @@ class PredisStorageTest extends TestCase
 
         $this->storage->remove();
     }
-    
+
     /**
      * Tests setMicrotime() fails.
-     *
-     * @test
      */
     public function testSetMicrotimeFails()
     {
         $this->expectException(StorageException::class);
         $redis = $this->createMock(Client::class);
-        $redis->expects($this->once())->method("__call")
-                ->with("set")
-                ->willReturn(false);
-        $storage = new PredisStorage("test", $redis);
+        $redis->expects($this->once())
+            ->method('__call')
+            ->with('set')
+            ->willReturn(false);
+        $storage = new PredisStorage('test', $redis);
         $storage->setMicrotime(1);
     }
-    
+
     /**
      * Tests getMicrotime() fails.
-     *
-     * @test
      */
     public function testGetMicrotimeFails()
     {

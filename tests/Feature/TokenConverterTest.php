@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Tests\Feature;
 
 use phpmock\phpunit\PHPMock;
@@ -18,7 +20,6 @@ use Securepoint\TokenBucket\Util\TokenConverter;
  */
 class TokenConverterTest extends TestCase
 {
-
     use PHPMock;
 
     /**
@@ -27,8 +28,6 @@ class TokenConverterTest extends TestCase
      * @param int $expected The expected tokens.
      * @param double $seconds The seconds.
      * @param Rate $rate The rate.
-     *
-     * @test
      */
     #[DataProvider('provideTestConvertSecondsToTokens')]
     public function testConvertSecondsToTokens($expected, $seconds, Rate $rate)
@@ -64,8 +63,6 @@ class TokenConverterTest extends TestCase
      * @param double $expected The expected seconds.
      * @param int $tokens The tokens.
      * @param Rate $rate The rate.
-     *
-     * @test
      */
     #[DataProvider('provideTestconvertTokensToSeconds')]
     public function testconvertTokensToSeconds($expected, $tokens, Rate $rate)
@@ -95,14 +92,13 @@ class TokenConverterTest extends TestCase
      * @param double $delta The expected delta.
      * @param int $tokens The tokens.
      * @param Rate $rate The rate.
-     *
-     * @test
      */
     #[DataProvider('provideTestConvertTokensToMicrotime')]
     public function testConvertTokensToMicrotime($delta, $tokens, Rate $rate)
     {
-        $microtime = $this->getFunctionMock(__NAMESPACE__, "microtime");
-        $microtime->expects($this->any())->willReturn(100000);
+        $microtime = $this->getFunctionMock(__NAMESPACE__, 'microtime');
+        $microtime->expects($this->any())
+            ->willReturn(100000);
 
         $converter = new TokenConverter($rate);
 

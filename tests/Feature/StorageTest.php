@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Tests\Feature;
 
-use PHPUnit\Framework\Attributes\DataProvider;
+use Memcached;
 use org\bovigo\vfs\vfsStream;
+use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Redis;
 use Predis\Client;
+use Redis;
+use Securepoint\TokenBucket\Rate;
 use Securepoint\TokenBucket\Storage\FileStorage;
 use Securepoint\TokenBucket\Storage\IPCStorage;
 use Securepoint\TokenBucket\Storage\MemcachedStorage;
@@ -17,7 +22,6 @@ use Securepoint\TokenBucket\Storage\SessionStorage;
 use Securepoint\TokenBucket\Storage\SingleProcessStorage;
 use Securepoint\TokenBucket\Storage\Storage;
 use Securepoint\TokenBucket\TokenBucket;
-use Securepoint\TokenBucket\Rate;
 
 /**
  * Tests for Storage implementations.
@@ -37,7 +41,6 @@ use Securepoint\TokenBucket\Rate;
  */
 class StorageTest extends TestCase
 {
-
     /**
      * @var Storage The tested storage;
      */
@@ -45,7 +48,7 @@ class StorageTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (!is_null($this->storage) && $this->storage->isBootstrapped()) {
+        if ($this->storage !== null && $this->storage->isBootstrapped()) {
             $this->storage->remove();
         }
     }
@@ -58,59 +61,59 @@ class StorageTest extends TestCase
     public function provideStorageFactories()
     {
         $cases = [
-            "SingleProcessStorage" => [function () {
+            'SingleProcessStorage' => [function () {
                 return new SingleProcessStorage();
             }],
-            "SessionStorage" => [function () {
-                return new SessionStorage("test");
+            'SessionStorage' => [function () {
+                return new SessionStorage('test');
             }],
-            "FileStorage" => [function () {
+            'FileStorage' => [function () {
                 vfsStream::setup('fileStorage');
-                return new FileStorage(vfsStream::url("fileStorage/data"));
+                return new FileStorage(vfsStream::url('fileStorage/data'));
             }],
-            "sqlite" => [function () {
-                $pdo = new PDO("sqlite::memory:");
+            'sqlite' => [function () {
+                $pdo = new PDO('sqlite::memory:');
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                return new PDOStorage("test", $pdo);
+                return new PDOStorage('test', $pdo);
             }],
-            "IPCStorage" => [function () {
-                return new IPCStorage(ftok(__FILE__, "a"));
+            'IPCStorage' => [function () {
+                return new IPCStorage(ftok(__FILE__, 'a'));
             }],
         ];
 
-        if (getenv("MYSQL_DSN")) {
-            $cases["MYSQL"] = [function () {
-                $pdo = new PDO(getenv("MYSQL_DSN"), getenv("MYSQL_USER"));
+        if (getenv('MYSQL_DSN')) {
+            $cases['MYSQL'] = [function () {
+                $pdo = new PDO(getenv('MYSQL_DSN'), getenv('MYSQL_USER'));
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
-                return new PDOStorage("test", $pdo);
+                return new PDOStorage('test', $pdo);
             }];
         }
-        if (getenv("PGSQL_DSN")) {
-            $cases["PGSQL"] = [function () {
-                $pdo = new PDO(getenv("PGSQL_DSN"), getenv("PGSQL_USER"));
+        if (getenv('PGSQL_DSN')) {
+            $cases['PGSQL'] = [function () {
+                $pdo = new PDO(getenv('PGSQL_DSN'), getenv('PGSQL_USER'));
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                return new PDOStorage("test", $pdo);
+                return new PDOStorage('test', $pdo);
             }];
         }
-        if (getenv("MEMCACHE_HOST")) {
-            $cases["MemcachedStorage"] = [function () {
+        if (getenv('MEMCACHE_HOST')) {
+            $cases['MemcachedStorage'] = [function () {
                 $memcached = new Memcached();
-                $memcached->addServer(getenv("MEMCACHE_HOST"), 11211);
-                return new MemcachedStorage("test", $memcached);
+                $memcached->addServer(getenv('MEMCACHE_HOST'), 11211);
+                return new MemcachedStorage('test', $memcached);
             }];
         }
-        if (getenv("REDIS_URI")) {
-            $cases["PHPRedisStorage"] = [function () {
-                $uri   = parse_url(getenv("REDIS_URI"));
+        if (getenv('REDIS_URI')) {
+            $cases['PHPRedisStorage'] = [function () {
+                $uri = parse_url(getenv('REDIS_URI'));
                 $redis = new Redis();
-                $redis->connect($uri["host"]);
-                return new PHPRedisStorage("test", $redis);
+                $redis->connect($uri['host']);
+                return new PHPRedisStorage('test', $redis);
             }];
 
-            $cases["PredisStorage"] = [function () {
-                $redis = new Client(getenv("REDIS_URI"));
-                return new PredisStorage("test", $redis);
+            $cases['PredisStorage'] = [function () {
+                $redis = new Client(getenv('REDIS_URI'));
+                return new PredisStorage('test', $redis);
             }];
         }
         return $cases;
@@ -120,7 +123,6 @@ class StorageTest extends TestCase
      * Tests setMicrotime() and getMicrotime().
      *
      * @param callable $storageFactory Returns a storage.
-     * @test
      */
     #[DataProvider('provideStorageFactories')]
     public function testSetAndGetMicrotime(callable $storageFactory)
@@ -144,7 +146,6 @@ class StorageTest extends TestCase
      * Tests isBootstrapped().
      *
      * @param callable $storageFactory Returns a storage.
-     * @test
      */
     #[DataProvider('provideStorageFactories')]
     public function testBootstrap(callable $storageFactory)
@@ -160,7 +161,6 @@ class StorageTest extends TestCase
      * Tests isBootstrapped().
      *
      * @param callable $storageFactory Returns a storage.
-     * @test
      */
     #[DataProvider('provideStorageFactories')]
     public function testIsBootstrapped(callable $storageFactory)
@@ -179,7 +179,6 @@ class StorageTest extends TestCase
      * Tests remove().
      *
      * @param callable $storageFactory Returns a storage.
-     * @test
      */
     #[DataProvider('provideStorageFactories')]
     public function testRemove(callable $storageFactory)
@@ -195,7 +194,6 @@ class StorageTest extends TestCase
      * When no tokens are available, the bucket should return false.
      *
      * @param callable $storageFactory Returns a storage.
-     * @test
      */
     #[DataProvider('provideStorageFactories')]
     public function testConsumingUnavailableTokensReturnsFalse(callable $storageFactory)
@@ -213,7 +211,6 @@ class StorageTest extends TestCase
      * When tokens are available, the bucket should return true.
      *
      * @param callable $storageFactory Returns a storage.
-     * @test
      */
     #[DataProvider('provideStorageFactories')]
     public function testConsumingAvailableTokensReturnsTrue(callable $storageFactory)
@@ -231,16 +228,16 @@ class StorageTest extends TestCase
      * Tests synchronized bootstrap
      *
      * @param callable $storageFactory Returns a storage.
-     * @test
      */
     #[DataProvider('provideStorageFactories')]
     public function testSynchronizedBootstrap(callable $storageFactory)
     {
         $this->storage = call_user_func($storageFactory);
-        $this->storage->getMutex()->synchronized(function () {
-            $this->assertFalse($this->storage->isBootstrapped());
-            $this->storage->bootstrap(123);
-            $this->assertTrue($this->storage->isBootstrapped());
-        });
+        $this->storage->getMutex()
+            ->synchronized(function () {
+                $this->assertFalse($this->storage->isBootstrapped());
+                $this->storage->bootstrap(123);
+                $this->assertTrue($this->storage->isBootstrapped());
+            });
     }
 }

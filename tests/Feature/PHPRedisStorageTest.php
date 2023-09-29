@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Tests\Feature;
 
-use Securepoint\TokenBucket\Storage\StorageException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Redis;
 use Securepoint\TokenBucket\Storage\PHPRedisStorage;
+use Securepoint\TokenBucket\Storage\StorageException;
 
 /**
  * Tests for PHPRedisStorage.
@@ -20,7 +22,6 @@ use Securepoint\TokenBucket\Storage\PHPRedisStorage;
  */
 class PHPRedisStorageTest extends TestCase
 {
-
     /**
      * @var Redis The API.
      */
@@ -30,26 +31,25 @@ class PHPRedisStorageTest extends TestCase
      * @var PHPRedisStorage The SUT.
      */
     private $storage;
-    
+
     protected function setUp(): void
     {
         parent::setUp();
-        
-        if (!getenv("REDIS_URI")) {
+
+        if (! getenv('REDIS_URI')) {
             $this->markTestSkipped();
         }
-        $uri = parse_url(getenv("REDIS_URI"));
+        $uri = parse_url(getenv('REDIS_URI'));
         $this->redis = new Redis();
-        $this->redis->connect($uri["host"]);
-        
-        $this->storage = new PHPRedisStorage("test", $this->redis);
+        $this->redis->connect($uri['host']);
+
+        $this->storage = new PHPRedisStorage('test', $this->redis);
     }
-    
+
     /**
      * Tests broken server communication.
      *
      * @param callable $method The tested method.
-     * @test
      */
     #[DataProvider('provideTestBrokenCommunication')]
     public function testBrokenCommunication(callable $method)
@@ -84,11 +84,9 @@ class PHPRedisStorageTest extends TestCase
             }],
         ];
     }
-    
+
     /**
      * Tests remove() fails.
-     *
-     * @test
      */
     public function testRemoveFails()
     {
@@ -98,26 +96,23 @@ class PHPRedisStorageTest extends TestCase
 
         $this->storage->remove();
     }
-    
+
     /**
      * Tests setMicrotime() fails.
-     *
-     * @test
      */
     public function testSetMicrotimeFails()
     {
         $this->expectException(StorageException::class);
         $redis = $this->createMock(Redis::class);
-        $redis->expects($this->once())->method("set")
-                ->willReturn(false);
-        $storage = new PHPRedisStorage("test", $redis);
+        $redis->expects($this->once())
+            ->method('set')
+            ->willReturn(false);
+        $storage = new PHPRedisStorage('test', $redis);
         $storage->setMicrotime(1);
     }
-    
+
     /**
      * Tests getMicrotime() fails.
-     *
-     * @test
      */
     public function testGetMicrotimeFails()
     {

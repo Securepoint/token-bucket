@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Tests;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Securepoint\TokenBucket\Rate;
@@ -16,21 +19,18 @@ use Securepoint\TokenBucket\Rate;
  */
 class RateTest extends TestCase
 {
-
     /**
      * Tests getTokensPerSecond().
      *
      * @param double $expected The expected rate in tokens per second.
      * @param Rate   $rate     The rate.
-     *
-     * @test
      */
     #[DataProvider('provideTestGetTokensPerSecond')]
     public function testGetTokensPerSecond($expected, Rate $rate)
     {
         $this->assertEquals($expected, $rate->getTokensPerSecond());
     }
-    
+
     /**
      * Provides tests cases for testGetTokensPerSecond().
      *
@@ -39,18 +39,18 @@ class RateTest extends TestCase
     public static function provideTestGetTokensPerSecond()
     {
         return [
-            [1/60/60/24/365, new Rate(1, Rate::YEAR)],
-            [2/60/60/24/365, new Rate(2, Rate::YEAR)],
-            [1/2629743.83, new Rate(1, Rate::MONTH)],
-            [2/2629743.83, new Rate(2, Rate::MONTH)],
-            [1/60/60/24/7, new Rate(1, Rate::WEEK)],
-            [2/60/60/24/7, new Rate(2, Rate::WEEK)],
-            [1/60/60/24, new Rate(1, Rate::DAY)],
-            [2/60/60/24, new Rate(2, Rate::DAY)],
-            [1/60/60, new Rate(1, Rate::HOUR)],
-            [2/60/60, new Rate(2, Rate::HOUR)],
-            [1/60, new Rate(1, Rate::MINUTE)],
-            [2/60, new Rate(2, Rate::MINUTE)],
+            [1 / 60 / 60 / 24 / 365, new Rate(1, Rate::YEAR)],
+            [2 / 60 / 60 / 24 / 365, new Rate(2, Rate::YEAR)],
+            [1 / 2629743.83, new Rate(1, Rate::MONTH)],
+            [2 / 2629743.83, new Rate(2, Rate::MONTH)],
+            [1 / 60 / 60 / 24 / 7, new Rate(1, Rate::WEEK)],
+            [2 / 60 / 60 / 24 / 7, new Rate(2, Rate::WEEK)],
+            [1 / 60 / 60 / 24, new Rate(1, Rate::DAY)],
+            [2 / 60 / 60 / 24, new Rate(2, Rate::DAY)],
+            [1 / 60 / 60, new Rate(1, Rate::HOUR)],
+            [2 / 60 / 60, new Rate(2, Rate::HOUR)],
+            [1 / 60, new Rate(1, Rate::MINUTE)],
+            [2 / 60, new Rate(2, Rate::MINUTE)],
             [1, new Rate(1, Rate::SECOND)],
             [2, new Rate(2, Rate::SECOND)],
             [1000, new Rate(1, Rate::MILLISECOND)],
@@ -59,22 +59,18 @@ class RateTest extends TestCase
             [2000000, new Rate(2, Rate::MICROSECOND)],
         ];
     }
-    
+
     /**
      * Tests building a rate with an invalid unit fails.
-     *
-     * @test
      */
     public function testInvalidUnit()
     {
         $this->expectException(InvalidArgumentException::class);
-        new Rate(1, "invalid");
+        new Rate(1, 'invalid');
     }
 
     /**
      * Tests building a rate with an invalid amount fails.
-     *
-     * @test
      */
     #[DataProvider('provideTestInvalidAmount')]
     public function testInvalidAmount($amount)
@@ -90,9 +86,6 @@ class RateTest extends TestCase
      */
     public static function provideTestInvalidAmount()
     {
-        return [
-            [0],
-            [-1],
-        ];
+        return [[0], [-1]];
     }
 }

@@ -1,14 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Tests\Feature;
 
-use PHPUnit\Framework\Attributes\DataProvider;
+use Memcached;
 use org\bovigo\vfs\vfsStream;
+use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Redis;
 use Predis\Client;
+use Redis;
 use Securepoint\TokenBucket\Storage\FileStorage;
 use Securepoint\TokenBucket\Storage\IPCStorage;
+use Securepoint\TokenBucket\Storage\MemcachedStorage;
+use Securepoint\TokenBucket\Storage\PDOStorage;
+use Securepoint\TokenBucket\Storage\PHPRedisStorage;
+use Securepoint\TokenBucket\Storage\PredisStorage;
 use Securepoint\TokenBucket\Storage\SessionStorage;
 use Securepoint\TokenBucket\Storage\StorageException;
 
@@ -30,12 +38,8 @@ use Securepoint\TokenBucket\Storage\StorageException;
  */
 class SharedStorageTest extends TestCase
 {
+    private array $storages = [];
 
-    /**
-     * @var Storages Tests storages.
-     */
-    private $storages = [];
-    
     protected function tearDown(): void
     {
         foreach ($this->storages as $storage) {
@@ -46,7 +50,7 @@ class SharedStorageTest extends TestCase
             }
         }
     }
-    
+
     /**
      * Provides shared Storage implementations.
      *
@@ -61,7 +65,7 @@ class SharedStorageTest extends TestCase
 
             [function ($name) {
                 vfsStream::setup('fileStorage');
-                return new FileStorage(vfsStream::url("fileStorage/$name"));
+                return new FileStorage(vfsStream::url("fileStorage/{$name}"));
             }],
 
             [function ($name) {
@@ -70,78 +74,76 @@ class SharedStorageTest extends TestCase
             }],
 
             [function ($name) {
-                $pdo = new PDO("sqlite::memory:");
+                $pdo = new PDO('sqlite::memory:');
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return new PDOStorage($name, $pdo);
             }],
         ];
-        
-        if (getenv("MYSQL_DSN")) {
+
+        if (getenv('MYSQL_DSN')) {
             $cases[] = [function ($name) {
-                $pdo = new PDO(getenv("MYSQL_DSN"), getenv("MYSQL_USER"));
+                $pdo = new PDO(getenv('MYSQL_DSN'), getenv('MYSQL_USER'));
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
-                
+
                 $storage = new PDOStorage($name, $pdo);
-                
+
                 $pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, true);
-                
+
                 return $storage;
             }];
         }
-        if (getenv("PGSQL_DSN")) {
+        if (getenv('PGSQL_DSN')) {
             $cases[] = [function ($name) {
-                $pdo = new PDO(getenv("PGSQL_DSN"), getenv("PGSQL_USER"));
+                $pdo = new PDO(getenv('PGSQL_DSN'), getenv('PGSQL_USER'));
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return new PDOStorage($name, $pdo);
             }];
         }
-        if (getenv("MEMCACHE_HOST")) {
+        if (getenv('MEMCACHE_HOST')) {
             $cases[] = [function ($name) {
                 $memcached = new Memcached();
-                $memcached->addServer(getenv("MEMCACHE_HOST"), 11211);
+                $memcached->addServer(getenv('MEMCACHE_HOST'), 11211);
                 return new MemcachedStorage($name, $memcached);
             }];
         }
-        if (getenv("REDIS_URI")) {
-            $cases["PHPRedisStorage"] = [function ($name) {
-                $uri   = parse_url(getenv("REDIS_URI"));
+        if (getenv('REDIS_URI')) {
+            $cases['PHPRedisStorage'] = [function ($name) {
+                $uri = parse_url(getenv('REDIS_URI'));
                 $redis = new Redis();
-                $redis->connect($uri["host"]);
+                $redis->connect($uri['host']);
                 return new PHPRedisStorage($name, $redis);
             }];
-            
-            $cases["PredisStorage"] = [function ($name) {
-                $redis = new Client(getenv("REDIS_URI"));
+
+            $cases['PredisStorage'] = [function ($name) {
+                $redis = new Client(getenv('REDIS_URI'));
                 return new PredisStorage($name, $redis);
             }];
         }
         return $cases;
     }
-    
+
     /**
      * Tests two storages with different names don't interfere each other.
      *
      * @param callable $factory The Storage factory.
-     *
-     * @test
      */
     #[DataProvider('provideStorageFactories')]
     public function testStoragesDontInterfere(callable $factory)
     {
-        $storageA = call_user_func($factory, "A");
+        $storageA = call_user_func($factory, 'A');
         $storageA->bootstrap(0);
         $storageA->getMicrotime();
         $this->storages[] = $storageA;
 
-        $storageB = call_user_func($factory, "B");
+        $storageB = call_user_func($factory, 'B');
         $storageB->bootstrap(0);
         $storageB->getMicrotime();
         $this->storages[] = $storageB;
-        
+
         $storageA->setMicrotime(1);
         $storageB->setMicrotime(2);
-        
+
         $this->assertNotEquals($storageA->getMicrotime(), $storageB->getMicrotime());
     }
 }
