@@ -25,8 +25,8 @@ class RateTest extends TestCase
      * @param double $expected The expected rate in tokens per second.
      * @param Rate   $rate     The rate.
      */
-    #[DataProvider('provideTestGetTokensPerSecond')]
-    public function testGetTokensPerSecond($expected, Rate $rate)
+    #[DataProvider(methodName: 'provideTestGetTokensPerSecond')]
+    public function testGetTokensPerSecond(float $expected, Rate $rate)
     {
         $this->assertEquals($expected, $rate->getTokensPerSecond());
     }
@@ -36,7 +36,7 @@ class RateTest extends TestCase
      *
      * @return array Test cases.
      */
-    public static function provideTestGetTokensPerSecond()
+    public static function provideTestGetTokensPerSecond(): array
     {
         return [
             [1 / 60 / 60 / 24 / 365, new Rate(1, Rate::YEAR)],
@@ -72,7 +72,7 @@ class RateTest extends TestCase
     /**
      * Tests building a rate with an invalid amount fails.
      */
-    #[DataProvider('provideTestInvalidAmount')]
+    #[DataProvider(methodName: 'provideTestInvalidAmount')]
     public function testInvalidAmount($amount)
     {
         $this->expectException(InvalidArgumentException::class);

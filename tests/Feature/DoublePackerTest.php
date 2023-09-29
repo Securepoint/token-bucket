@@ -36,7 +36,7 @@ class DoublePackerTest extends TestCase
      *
      * @return array Test cases.
      */
-    public function provideTestPack()
+    public static function provideTestPack()
     {
         return [[pack('d', 0), 0], [pack('d', 0.1), 0.1], [pack('d', 1), 1]];
     }
@@ -58,7 +58,7 @@ class DoublePackerTest extends TestCase
      *
      * @return array Test cases.
      */
-    public function provideTestUnpackFails()
+    public static function provideTestUnpackFails()
     {
         return [[''], ['1234567'], ['123456789']];
     }
@@ -80,7 +80,7 @@ class DoublePackerTest extends TestCase
      *
      * @return array Test cases.
      */
-    public function provideTestUnpack()
+    public static function provideTestUnpack()
     {
         return [[0, pack('d', 0)], [0.1, pack('d', 0.1)], [1, pack('d', 1)], [1.1, pack('d', 1.1)]];
     }

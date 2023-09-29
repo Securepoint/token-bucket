@@ -110,7 +110,7 @@ class TokenConverterTest extends TestCase
      *
      * @return array Test cases.
      */
-    public function provideTestConvertTokensToMicrotime()
+    public static function provideTestConvertTokensToMicrotime()
     {
         return [
             [-1, 1, new Rate(1, Rate::SECOND)],

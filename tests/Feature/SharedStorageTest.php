@@ -56,7 +56,7 @@ class SharedStorageTest extends TestCase
      *
      * @return callable[][] Storage factories.
      */
-    public function provideStorageFactories()
+    public static function provideStorageFactories()
     {
         $cases = [
             [function ($name) {

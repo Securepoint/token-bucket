@@ -46,7 +46,7 @@ class PDOStorageTest extends TestCase
      *
      * @return PDO[][] The PDOs.
      */
-    public function providePDO()
+    public static function providePDO()
     {
         $cases = [[new PDO('sqlite::memory:')]];
         if (getenv('MYSQL_DSN')) {
@@ -104,7 +104,7 @@ class PDOStorageTest extends TestCase
      *
      * @return int[][] Invalid error modes.
      */
-    public function provideTestInvalidErrorMode()
+    public static function provideTestInvalidErrorMode()
     {
         return [[PDO::ERRMODE_SILENT], [PDO::ERRMODE_WARNING]];
     }

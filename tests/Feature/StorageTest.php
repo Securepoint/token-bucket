@@ -58,7 +58,7 @@ class StorageTest extends TestCase
      *
      * @return callable[][] Storage factories.
      */
-    public function provideStorageFactories()
+    public static function provideStorageFactories()
     {
         $cases = [
             'SingleProcessStorage' => [function () {

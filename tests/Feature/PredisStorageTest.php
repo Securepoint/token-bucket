@@ -66,7 +66,7 @@ class PredisStorageTest extends TestCase
      *
      * @return array Testcases.
      */
-    public function provideTestBrokenCommunication()
+    public static function provideTestBrokenCommunication()
     {
         return [
             [function (PredisStorage $storage) {
