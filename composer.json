@@ -1,9 +1,9 @@
 {
-    "name": "bandwidth-throttle/token-bucket",
+    "name": "securepoint/token-bucket",
     "type": "library",
     "description": "Implementation of the Token Bucket algorithm.",
     "keywords": ["token bucket", "bandwidth", "rate limit", "throttle", "throttling", "rate limiting"],
-    "homepage": "https://github.com/bandwidth-throttle/token-bucket",
+    "homepage": "https://github.com/securepoint/token-bucket",
     "license": "WTFPL",
     "authors": [
         {
@@ -11,24 +11,56 @@
             "email": "markus@malkusch.de",
             "homepage": "http://markus.malkusch.de",
             "role": "Developer"
+        },
+        {
+            "name": "Jan Wehner",
+            "email": "jan.wehner@securepoint.de",
+            "homepage": "https://securepoint.de",
+            "role": "Developer"
         }
     ],
     "autoload": {
-        "psr-4": {"bandwidthThrottle\\tokenBucket\\": "classes/"}
+        "psr-4": {"Securepoint\\TokenBucket\\": "src/"}
     },
     "require": {
-        "php": ">=5.6",
-        "malkusch/lock": "^1",
+        "php": "^8.1",
+        "malkusch/lock": "^2.2",
         "ext-bcmath":"*"
     },
     "require-dev": {
-        "ext-redis": "^2.2.4|^3",
-        "predis/predis": "^1",
-        "phpunit/phpunit": "^5",
-        "mikey179/vfsStream": "^1.5.0",
-        "php-mock/php-mock-phpunit": "^1"
+        "ext-redis": "*",
+        "predis/predis": "^2.2",
+        "phpunit/phpunit": "^10.3",
+        "mikey179/vfsstream": "^1.6",
+        "php-mock/php-mock-phpunit": "^2.7",
+        "phpstan/phpstan": "^1.10",
+        "phpstan/phpstan-deprecation-rules": "^1.1",
+        "symplify/easy-coding-standard": "^12.0",
+        "symplify/coding-standard": "^12.0",
+        "rector/rector": "^0.18.4"
     },
     "archive": {
         "exclude": ["/tests"]
+    },
+    "scripts": {
+        "cs": "@php vendor/bin/ecs check ",
+        "fs": "@php vendor/bin/ecs check --fix ",
+        "testp": "@php ./vendor/bin/pest --parallel --processes=12",
+        "rector": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php -dmemory_limit=1G ./vendor/bin/rector --autoload-file=vendor/autoload.php"
+        ],
+        "rector-all": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php -dmemory_limit=1G ./vendor/bin/rector --autoload-file=vendor/autoload.php process src tests"
+        ],
+        "phpstan": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php -dmemory_limit=1G ./vendor/bin/phpstan analyse"
+        ],
+        "phpstan-all": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php -dmemory_limit=1G ./vendor/bin/phpstan analyse src tests"
+        ]
     }
 }

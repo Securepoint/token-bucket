@@ -20,7 +20,7 @@ composer require bandwidth-throttle/token-bucket
 # Usage
 
 The package is in the namespace
-[`bandwidthThrottle\tokenBucket`](http://bandwidth-throttle.github.io/token-bucket/api/namespace-bandwidthThrottle.tokenBucket.html).
+[`Securepoint\TokenBucket`](http://bandwidth-throttle.github.io/token-bucket/api/namespace-bandwidthThrottle.tokenBucket.html).
 
 ## Example
 
@@ -28,9 +28,9 @@ This example will limit the rate of a global resource to 10 requests per second
 for all requests.
 
 ```php
-use bandwidthThrottle\tokenBucket\Rate;
-use bandwidthThrottle\tokenBucket\TokenBucket;
-use bandwidthThrottle\tokenBucket\storage\FileStorage;
+use Securepoint\TokenBucket\Rate;
+use Securepoint\TokenBucket\TokenBucket;
+use Securepoint\TokenBucket\Storage\FileStorage;
 
 $storage = new FileStorage(__DIR__ . "/api.bucket");
 $rate    = new Rate(10, Rate::SECOND);
@@ -120,10 +120,10 @@ serving the requests. You can do this by consuming the token bucket with
 a [`BlockingConsumer`](http://bandwidth-throttle.github.io/token-bucket/api/class-bandwidthThrottle.tokenBucket.BlockingConsumer.html).
 
 ```php
-use bandwidthThrottle\tokenBucket\Rate;
-use bandwidthThrottle\tokenBucket\TokenBucket;
-use bandwidthThrottle\tokenBucket\BlockingConsumer;
-use bandwidthThrottle\tokenBucket\storage\FileStorage;
+use Securepoint\TokenBucket\Rate;
+use Securepoint\TokenBucket\TokenBucket;
+use Securepoint\TokenBucket\BlockingConsumer;
+use Securepoint\TokenBucket\Storage\FileStorage;
 
 $storage  = new FileStorage(__DIR__ . "/api.bucket");
 $rate     = new Rate(10, Rate::SECOND);
