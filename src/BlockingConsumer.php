@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Secuepoint\TokenBucket;
+namespace Securepoint\TokenBucket;
 
 use InvalidArgumentException;
 use LengthException;
-use Secuepoint\TokenBucket\Storage\StorageException;
+use Securepoint\TokenBucket\Storage\StorageException;
 use Securepoint\TokenBucket\TokenBucket;
 
 /**
