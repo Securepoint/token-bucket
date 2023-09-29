@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Secuepoint\TokenBucket;
 
+use InvalidArgumentException;
+use LengthException;
 use Secuepoint\TokenBucket\Storage\StorageException;
 use Securepoint\TokenBucket\TokenBucket;
 
@@ -14,12 +18,11 @@ use Securepoint\TokenBucket\TokenBucket;
  */
 final class BlockingConsumer
 {
-    
     /**
      * @var TokenBucket The token bucket.
      */
     private $bucket;
-    
+
     /**
      * @var int|null optional timeout in seconds.
      */
@@ -36,11 +39,11 @@ final class BlockingConsumer
         $this->bucket = $bucket;
 
         if ($timeout < 0) {
-            throw new \InvalidArgumentException("Timeout must be null or positive");
+            throw new InvalidArgumentException('Timeout must be null or positive');
         }
         $this->timeout = $timeout;
     }
-    
+
     /**
      * Consumes tokens.
      *
@@ -49,17 +52,17 @@ final class BlockingConsumer
      *
      * @param int $tokens The token amount.
      *
-     * @throws \LengthException The token amount is larger than the bucket's capacity.
+     * @throws LengthException The token amount is larger than the bucket's capacity.
      * @throws StorageException The stored microtime could not be accessed.
      * @throws TimeoutException The timeout was exceeded.
      */
     public function consume($tokens)
     {
-        $timedOut = is_null($this->timeout) ? null : (microtime(true) + $this->timeout);
-        while (!$this->bucket->consume($tokens, $seconds)) {
+        $timedOut = $this->timeout === null ? null : (microtime(true) + $this->timeout);
+        while (! $this->bucket->consume($tokens, $seconds)) {
             self::throwTimeoutIfExceeded($timedOut);
             $seconds = self::keepSecondsWithinTimeout($seconds, $timedOut);
-            
+
             // avoid an overflow before converting $seconds into microseconds.
             if ($seconds > 1) {
                 // leave more than one second to avoid sleeping the minimum of one millisecond.
@@ -73,7 +76,7 @@ final class BlockingConsumer
             usleep(max(1000, $seconds * 1000000));
         }
     }
-    
+
     /**
      * Checks if the timeout was exceeded.
      *
@@ -82,14 +85,14 @@ final class BlockingConsumer
      */
     private static function throwTimeoutIfExceeded($timedOut)
     {
-        if (is_null($timedOut)) {
+        if ($timedOut === null) {
             return;
         }
         if (time() >= $timedOut) {
-            throw new TimeoutException("Timed out");
+            throw new TimeoutException('Timed out');
         }
     }
-    
+
     /**
      * Adjusts the wait seconds to be within the timeout.
      *
@@ -100,7 +103,7 @@ final class BlockingConsumer
      */
     private static function keepSecondsWithinTimeout($seconds, $timedOut)
     {
-        if (is_null($timedOut)) {
+        if ($timedOut === null) {
             return $seconds;
         }
         $remainingSeconds = max($timedOut - microtime(true), 0);

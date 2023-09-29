@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket;
 
+use InvalidArgumentException;
+use LengthException;
 use malkusch\lock\exception\MutexException;
 use Securepoint\TokenBucket\Storage\Storage;
 use Securepoint\TokenBucket\Storage\StorageException;
@@ -38,27 +42,26 @@ use Securepoint\TokenBucket\Util\TokenConverter;
  */
 final class TokenBucket
 {
-
     /**
      * @var Rate The rate.
      */
     private $rate;
-    
+
     /**
      * @var int Token capacity of this bucket.
      */
     private $capacity;
-    
+
     /**
      * @var Storage The storage.
      */
     private $storage;
-    
+
     /**
      * @var TokenConverter Token converter.
      */
     private $tokenConverter;
-    
+
     /**
      * Initializes the Token bucket.
      *
@@ -71,16 +74,16 @@ final class TokenBucket
     public function __construct($capacity, Rate $rate, Storage $storage)
     {
         if ($capacity <= 0) {
-            throw new \InvalidArgumentException("Capacity should be greater than 0.");
+            throw new InvalidArgumentException('Capacity should be greater than 0.');
         }
 
         $this->capacity = $capacity;
-        $this->rate     = $rate;
-        $this->storage  = $storage;
+        $this->rate = $rate;
+        $this->storage = $storage;
 
         $this->tokenConverter = new TokenConverter($rate);
     }
-    
+
     /**
      * Bootstraps the storage with an initial amount of tokens.
      *
@@ -96,34 +99,32 @@ final class TokenBucket
      * @param int $tokens Initial amount of tokens, default is 0.
      *
      * @throws StorageException Bootstrapping failed.
-     * @throws \LengthException The initial amount of tokens is larger than the capacity.
+     * @throws LengthException The initial amount of tokens is larger than the capacity.
      */
     public function bootstrap($tokens = 0)
     {
         try {
             if ($tokens > $this->capacity) {
-                throw new \LengthException(
-                    "Initial token amount ($tokens) is larger than the capacity ($this->capacity)."
+                throw new LengthException(
+                    "Initial token amount ({$tokens}) is larger than the capacity ({$this->capacity})."
                 );
             }
             if ($tokens < 0) {
-                throw new \InvalidArgumentException(
-                    "Initial token amount ($tokens) should be greater than 0."
-                );
+                throw new InvalidArgumentException("Initial token amount ({$tokens}) should be greater than 0.");
             }
-            
+
             $this->storage->getMutex()
                 ->check(function () {
-                    return !$this->storage->isBootstrapped();
+                    return ! $this->storage->isBootstrapped();
                 })
                 ->then(function () use ($tokens) {
                     $this->storage->bootstrap($this->tokenConverter->convertTokensToMicrotime($tokens));
                 });
         } catch (MutexException $e) {
-            throw new StorageException("Could not lock bootstrapping", 0, $e);
+            throw new StorageException('Could not lock bootstrapping', 0, $e);
         }
     }
-    
+
     /**
      * Consumes tokens from the bucket.
      *
@@ -134,46 +135,46 @@ final class TokenBucket
      * This method is threadsafe.
      *
      * @param int    $tokens   The token amount.
-     * @param double &$seconds The seconds to wait.
+     * @param double $seconds The seconds to wait.
      *
      * @return bool If tokens were consumed.
      * @SuppressWarnings(PHPMD)
      *
-     * @throws \LengthException The token amount is larger than the capacity.
+     * @throws LengthException The token amount is larger than the capacity.
      * @throws StorageException The stored microtime could not be accessed.
      */
     public function consume($tokens, &$seconds = 0)
     {
         try {
             if ($tokens > $this->capacity) {
-                throw new \LengthException("Token amount ($tokens) is larger than the capacity ($this->capacity).");
+                throw new LengthException("Token amount ({$tokens}) is larger than the capacity ({$this->capacity}).");
             }
             if ($tokens <= 0) {
-                throw new \InvalidArgumentException("Token amount ($tokens) should be greater than 0.");
+                throw new InvalidArgumentException("Token amount ({$tokens}) should be greater than 0.");
             }
 
-            return $this->storage->getMutex()->synchronized(
-                function () use ($tokens, &$seconds) {
-                    $tokensAndMicrotime = $this->loadTokensAndTimestamp();
-                    $microtime = $tokensAndMicrotime["microtime"];
-                    $availableTokens = $tokensAndMicrotime["tokens"];
+            return $this->storage->getMutex()
+                ->synchronized(
+                    function () use ($tokens, &$seconds) {
+                        $tokensAndMicrotime = $this->loadTokensAndTimestamp();
+                        $microtime = $tokensAndMicrotime['microtime'];
+                        $availableTokens = $tokensAndMicrotime['tokens'];
 
-                    $delta = $availableTokens - $tokens;
-                    if ($delta < 0) {
-                        $this->storage->letMicrotimeUnchanged();
-                        $passed  = microtime(true) - $microtime;
-                        $seconds = max(0, $this->tokenConverter->convertTokensToSeconds($tokens) - $passed);
-                        return false;
-                    } else {
+                        $delta = $availableTokens - $tokens;
+                        if ($delta < 0) {
+                            $this->storage->letMicrotimeUnchanged();
+                            $passed = microtime(true) - $microtime;
+                            $seconds = max(0, $this->tokenConverter->convertTokensToSeconds($tokens) - $passed);
+                            return false;
+                        }
                         $microtime += $this->tokenConverter->convertTokensToSeconds($tokens);
                         $this->storage->setMicrotime($microtime);
                         $seconds = 0;
                         return true;
                     }
-                }
-            );
+                );
         } catch (MutexException $e) {
-            throw new StorageException("Could not lock token consumption.", 0, $e);
+            throw new StorageException('Could not lock token consumption.', 0, $e);
         }
     }
 
@@ -186,7 +187,7 @@ final class TokenBucket
     {
         return $this->rate;
     }
-    
+
     /**
      * The token capacity of this bucket.
      *
@@ -212,9 +213,9 @@ final class TokenBucket
      */
     public function getTokens()
     {
-        return $this->loadTokensAndTimestamp()["tokens"];
+        return $this->loadTokensAndTimestamp()['tokens'];
     }
-    
+
     /**
      * Loads the stored timestamp and its respective amount of tokens.
      *
@@ -228,17 +229,17 @@ final class TokenBucket
     private function loadTokensAndTimestamp()
     {
         $microtime = $this->storage->getMicrotime();
-        
+
         // Drop overflowing tokens
         $minMicrotime = $this->tokenConverter->convertTokensToMicrotime($this->capacity);
         if ($minMicrotime > $microtime) {
             $microtime = $minMicrotime;
         }
-        
+
         $tokens = $this->tokenConverter->convertMicrotimeToTokens($microtime);
         return [
-            "tokens" => $tokens,
-            "microtime" => $microtime
+            'tokens' => $tokens,
+            'microtime' => $microtime,
         ];
     }
 }

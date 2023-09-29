@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket;
 
 /**
@@ -11,5 +13,4 @@ namespace Securepoint\TokenBucket;
  */
 final class TimeoutException extends TokenBucketException
 {
-
 }

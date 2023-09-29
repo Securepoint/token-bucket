@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Storage\Scope;
 
 /**
@@ -17,5 +19,4 @@ namespace Securepoint\TokenBucket\Storage\Scope;
  */
 interface GlobalScope
 {
-
 }

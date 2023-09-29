@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket;
+
+use InvalidArgumentException;
 
 /**
  * The rate.
@@ -11,32 +15,31 @@ namespace Securepoint\TokenBucket;
  */
 final class Rate
 {
-    
-    const MICROSECOND = "microsecond";
-    const MILLISECOND = "millisecond";
-    const SECOND = "second";
-    const MINUTE = "minute";
-    const HOUR   = "hour";
-    const DAY    = "day";
-    const WEEK   = "week";
-    const MONTH  = "month";
-    const YEAR   = "year";
+    public const MICROSECOND = 'microsecond';
+    public const MILLISECOND = 'millisecond';
+    public const SECOND = 'second';
+    public const MINUTE = 'minute';
+    public const HOUR = 'hour';
+    public const DAY = 'day';
+    public const WEEK = 'week';
+    public const MONTH = 'month';
+    public const YEAR = 'year';
 
     /**
      * @var double[] Mapping between units and seconds
      */
     private static $unitMap = [
-        self::MICROSECOND =>        0.000001,
-        self::MILLISECOND =>        0.001,
-        self::SECOND      =>        1,
-        self::MINUTE      =>       60,
-        self::HOUR        =>     3600,
-        self::DAY         =>    86400,
-        self::WEEK        =>   604800,
-        self::MONTH       =>  2629743.83,
-        self::YEAR        => 31556926,
+        self::MICROSECOND => 0.000001,
+        self::MILLISECOND => 0.001,
+        self::SECOND => 1,
+        self::MINUTE => 60,
+        self::HOUR => 3600,
+        self::DAY => 86400,
+        self::WEEK => 604800,
+        self::MONTH => 2629743.83,
+        self::YEAR => 31556926,
     ];
-    
+
     /**
      * @var int The amount of tokens to produce for the unit.
      */
@@ -46,7 +49,7 @@ final class Rate
      * @var string The unit.
      */
     private $unit;
-    
+
     /**
      * Sets the amount of tokens which will be produced per unit.
      *
@@ -57,14 +60,14 @@ final class Rate
      */
     public function __construct($tokens, $unit)
     {
-        if (!isset(self::$unitMap[$unit])) {
-            throw new \InvalidArgumentException("Not a valid unit.");
+        if (! isset(self::$unitMap[$unit])) {
+            throw new InvalidArgumentException('Not a valid unit.');
         }
         if ($tokens <= 0) {
-            throw new \InvalidArgumentException("Amount of tokens should be greater then 0.");
+            throw new InvalidArgumentException('Amount of tokens should be greater then 0.');
         }
         $this->tokens = $tokens;
-        $this->unit   = $unit;
+        $this->unit = $unit;
     }
 
     /**

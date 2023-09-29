@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Util;
 
 use Securepoint\TokenBucket\Rate;
@@ -14,17 +16,16 @@ use Securepoint\TokenBucket\Rate;
  */
 final class TokenConverter
 {
-    
     /**
      * @var Rate The rate.
      */
     private $rate;
-    
+
     /**
      * @var int precision scale for bc_* operations.
      */
     private $bcScale = 8;
-    
+
     /**
      * Sets the token rate.
      *
@@ -34,7 +35,7 @@ final class TokenConverter
     {
         $this->rate = $rate;
     }
-    
+
     /**
      * Converts a duration of seconds into an amount of tokens.
      *
@@ -45,7 +46,7 @@ final class TokenConverter
     {
         return (int) ($seconds * $this->rate->getTokensPerSecond());
     }
-    
+
     /**
      * Converts an amount of tokens into a duration of seconds.
      *
@@ -56,7 +57,7 @@ final class TokenConverter
     {
         return $tokens / $this->rate->getTokensPerSecond();
     }
-    
+
     /**
      * Converts an amount of tokens into a timestamp.
      *
@@ -67,7 +68,7 @@ final class TokenConverter
     {
         return microtime(true) - $this->convertTokensToSeconds($tokens);
     }
-    
+
     /**
      * Converts a timestamp into tokens.
      *

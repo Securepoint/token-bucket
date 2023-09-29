@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket;
+
+use Exception;
 
 /**
  * The package's base exception.
@@ -9,7 +13,6 @@ namespace Securepoint\TokenBucket;
  * @link bitcoin:1335STSwu9hST4vcMRppEPgENMHD2r1REK Donations
  * @license WTFPL
  */
-class TokenBucketException extends \Exception
+class TokenBucketException extends Exception
 {
-
 }

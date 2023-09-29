@@ -1,5 +1,6 @@
 <?php
 
+use Securepoint\TokenBucket\Storage\StorageException;
 use phpmock\phpunit\PHPMock;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
@@ -21,22 +22,20 @@ class FileStorageTest extends TestCase
     
     /**
      * Tests opening the file fails.
-     *
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testOpeningFails()
     {
+        $this->expectException(StorageException::class);
         vfsStream::setup('test');
         @new FileStorage(vfsStream::url("test/nonexisting/test"));
     }
 
     /**
      * Tests seeking fails in setMicrotime().
-     *
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testSetMicrotimeFailsSeeking()
     {
+        $this->expectException(StorageException::class);
         $this->getFunctionMock(__NAMESPACE__, "fseek")
                 ->expects($this->atLeastOnce())
                 ->willReturn(-1);
@@ -48,11 +47,10 @@ class FileStorageTest extends TestCase
 
     /**
      * Tests writings fails in setMicrotime().
-     *
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testSetMicrotimeFailsWriting()
     {
+        $this->expectException(StorageException::class);
         $this->getFunctionMock(__NAMESPACE__, "fwrite")
                 ->expects($this->atLeastOnce())
                 ->willReturn(false);
@@ -64,11 +62,10 @@ class FileStorageTest extends TestCase
 
     /**
      * Tests seeking fails in getMicrotime().
-     *
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testGetMicrotimeFailsSeeking()
     {
+        $this->expectException(StorageException::class);
         $this->getFunctionMock(__NAMESPACE__, "fseek")
                 ->expects($this->atLeastOnce())
                 ->willReturn(-1);
@@ -80,11 +77,10 @@ class FileStorageTest extends TestCase
 
     /**
      * Tests reading fails in getMicrotime().
-     *
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testGetMicrotimeFailsReading()
     {
+        $this->expectException(StorageException::class);
         $this->getFunctionMock(__NAMESPACE__, "fread")
                 ->expects($this->atLeastOnce())
                 ->willReturn(false);
@@ -96,11 +92,10 @@ class FileStorageTest extends TestCase
 
     /**
      * Tests readinging too little in getMicrotime().
-     *
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testGetMicrotimeReadsToLittle()
     {
+        $this->expectException(StorageException::class);
         $data = new vfsStreamFile("data");
         $data->setContent("1234567");
         vfsStream::setup('test')->addChild($data);
@@ -113,10 +108,10 @@ class FileStorageTest extends TestCase
      * Tests deleting fails.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testRemoveFails()
     {
+        $this->expectException(StorageException::class);
         $data = new vfsStreamFile("data");
         $root = vfsStream::setup('test');
         $root->chmod(0);

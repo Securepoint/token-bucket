@@ -1,9 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Storage;
 
-use PDO;
+use Exception;
+use InvalidArgumentException;
+use LengthException;
 use malkusch\lock\mutex\TransactionalMutex;
+use PDO;
+use PDOException;
 use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
 
 /**
@@ -17,22 +23,21 @@ use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
  */
 final class PDOStorage implements Storage, GlobalScope
 {
-
     /**
      * @var PDO The pdo.
      */
     private $pdo;
-    
+
     /**
      * @var string The shared name of the token bucket.
      */
     private $name;
-    
+
     /**
      * @var TransactionalMutex The mutex.
      */
     private $mutex;
-    
+
     /**
      * Sets the PDO and the bucket's name for the shared storage.
      *
@@ -45,67 +50,64 @@ final class PDOStorage implements Storage, GlobalScope
      * @param string $name The name of the token bucket.
      * @param PDO    $pdo  The PDO.
      *
-     * @throws \LengthException          The id should not be longer than 128 characters.
-     * @throws \InvalidArgumentException PDO must be configured to throw exceptions.
+     * @throws LengthException The id should not be longer than 128 characters.
+     * @throws InvalidArgumentException PDO must be configured to throw exceptions.
      */
-    public function __construct($name, \PDO $pdo)
+    public function __construct($name, PDO $pdo)
     {
         if (strlen($name) > 128) {
-            throw new \LengthException("The name should not be longer than 128 characters.");
+            throw new LengthException('The name should not be longer than 128 characters.');
         }
-        if ($pdo->getAttribute(\PDO::ATTR_ERRMODE) !== \PDO::ERRMODE_EXCEPTION) {
-            throw new \InvalidArgumentException("The pdo must have PDO::ERRMODE_EXCEPTION set.");
+        if ($pdo->getAttribute(PDO::ATTR_ERRMODE) !== PDO::ERRMODE_EXCEPTION) {
+            throw new InvalidArgumentException('The pdo must have PDO::ERRMODE_EXCEPTION set.');
         }
-        $this->pdo   = $pdo;
-        $this->name  = $name;
+        $this->pdo = $pdo;
+        $this->name = $name;
         $this->mutex = new TransactionalMutex($pdo);
     }
-    
+
     public function bootstrap($microtime)
     {
         try {
             try {
                 $this->onErrorRollback(function () {
-                    $options = $this->forVendor(["mysql" => "ENGINE=InnoDB CHARSET=utf8"]);
+                    $options = $this->forVendor([
+                        'mysql' => 'ENGINE=InnoDB CHARSET=utf8',
+                    ]);
                     $this->pdo->exec(
                         "CREATE TABLE TokenBucket (
                             name      VARCHAR(128)     PRIMARY KEY,
                             microtime DOUBLE PRECISION NOT NULL
-                         ) $options;"
+                         ) {$options};"
                     );
                 });
-            } catch (\PDOException $e) {
+            } catch (PDOException $e) {
                 /*
                  * This exception is ignored to provide a portable way
                  * to create a table only if it doesn't exist yet.
                  */
             }
 
-            $insert = $this->pdo->prepare(
-                "INSERT INTO TokenBucket (name, microtime) VALUES (?, ?)"
-            );
+            $insert = $this->pdo->prepare('INSERT INTO TokenBucket (name, microtime) VALUES (?, ?)');
             $insert->execute([$this->name, $microtime]);
             if ($insert->rowCount() !== 1) {
-                throw new StorageException("Failed to insert token bucket into storage '$this->name'");
+                throw new StorageException("Failed to insert token bucket into storage '{$this->name}'");
             }
-        } catch (\PDOException $e) {
-            throw new StorageException("Failed to bootstrap storage '$this->name'", 0, $e);
+        } catch (PDOException $e) {
+            throw new StorageException("Failed to bootstrap storage '{$this->name}'", 0, $e);
         }
     }
-    
+
     public function isBootstrapped()
     {
         try {
             return $this->onErrorRollback(function () {
-                return (bool) $this->querySingleValue(
-                    "SELECT 1 FROM TokenBucket WHERE name=?",
-                    [$this->name]
-                );
+                return (bool) $this->querySingleValue('SELECT 1 FROM TokenBucket WHERE name=?', [$this->name]);
             });
         } catch (StorageException $e) {
             // This seems to be a portable way to determine if the table exists or not.
             return false;
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             throw new StorageException("Can't check bootstrapped state", 0, $e);
         }
     }
@@ -113,35 +115,35 @@ final class PDOStorage implements Storage, GlobalScope
     public function remove()
     {
         try {
-            $delete = $this->pdo->prepare("DELETE FROM TokenBucket WHERE name = ?");
+            $delete = $this->pdo->prepare('DELETE FROM TokenBucket WHERE name = ?');
             $delete->execute([$this->name]);
 
-            $count = $this->querySingleValue("SELECT count(*) FROM TokenBucket");
-            if ($count == 0) {
-                $this->pdo->exec("DROP TABLE TokenBucket");
+            $count = $this->querySingleValue('SELECT count(*) FROM TokenBucket');
+            if ($count === 0) {
+                $this->pdo->exec('DROP TABLE TokenBucket');
             }
-        } catch (\PDOException $e) {
-            throw new StorageException("Failed to remove the storage.", 0, $e);
+        } catch (PDOException $e) {
+            throw new StorageException('Failed to remove the storage.', 0, $e);
         }
     }
 
     public function setMicrotime($microtime)
     {
         try {
-            $update = $this->pdo->prepare(
-                "UPDATE TokenBucket SET microtime = ? WHERE name = ?"
-            );
+            $update = $this->pdo->prepare('UPDATE TokenBucket SET microtime = ? WHERE name = ?');
             $update->execute([$microtime, $this->name]);
-        } catch (\PDOException $e) {
-            throw new StorageException("Failed to write to storage '$this->name'.", 0, $e);
+        } catch (PDOException $e) {
+            throw new StorageException("Failed to write to storage '{$this->name}'.", 0, $e);
         }
     }
-    
+
     public function getMicrotime()
     {
-        $forUpdate = $this->forVendor(["sqlite" => ""], "FOR UPDATE");
-        return (double) $this->querySingleValue(
-            "SELECT microtime from TokenBucket WHERE name = ? $forUpdate",
+        $forUpdate = $this->forVendor([
+            'sqlite' => '',
+        ], 'FOR UPDATE');
+        return (float) $this->querySingleValue(
+            "SELECT microtime from TokenBucket WHERE name = ? {$forUpdate}",
             [$this->name]
         );
     }
@@ -154,12 +156,12 @@ final class PDOStorage implements Storage, GlobalScope
      *
      * @return string The vendor specific value.
      */
-    private function forVendor(array $map, $default = "")
+    private function forVendor(array $map, $default = '')
     {
-        $vendor = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        $vendor = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         return isset($map[$vendor]) ? $map[$vendor] : $default;
     }
-    
+
     /**
      * Returns one value from a query.
      *
@@ -179,33 +181,33 @@ final class PDOStorage implements Storage, GlobalScope
 
             $statement->closeCursor();
             if ($value === false) {
-                throw new StorageException("The query returned no result.");
+                throw new StorageException('The query returned no result.');
             }
             return $value;
-        } catch (\PDOException $e) {
-            throw new StorageException("The query failed.", 0, $e);
+        } catch (PDOException $e) {
+            throw new StorageException('The query failed.', 0, $e);
         }
     }
 
     /**
      * Rollback to an implicit savepoint.
      *
-     * @throws \PDOException
+     * @throws PDOException
      */
     private function onErrorRollback(callable $code)
     {
-        if (!$this->pdo->inTransaction()) {
+        if (! $this->pdo->inTransaction()) {
             return call_user_func($code);
         }
-        
-        $this->pdo->exec("SAVEPOINT onErrorRollback");
+
+        $this->pdo->exec('SAVEPOINT onErrorRollback');
         try {
             $result = call_user_func($code);
-        } catch (\Exception $e) {
-            $this->pdo->exec("ROLLBACK TO SAVEPOINT onErrorRollback");
+        } catch (Exception $e) {
+            $this->pdo->exec('ROLLBACK TO SAVEPOINT onErrorRollback');
             throw $e;
         }
-        $this->pdo->exec("RELEASE SAVEPOINT onErrorRollback");
+        $this->pdo->exec('RELEASE SAVEPOINT onErrorRollback');
         return $result;
     }
 

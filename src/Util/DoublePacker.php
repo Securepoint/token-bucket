@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Util;
 
 use Securepoint\TokenBucket\Storage\StorageException;
@@ -14,7 +16,6 @@ use Securepoint\TokenBucket\Storage\StorageException;
  */
 final class DoublePacker
 {
-    
     /**
      * Packs a 64 bit double into an 8 byte string.
      *
@@ -23,11 +24,11 @@ final class DoublePacker
      */
     public static function pack($double)
     {
-        $string = pack("d", $double);
-        assert(8 === strlen($string));
+        $string = pack('d', $double);
+        assert(strlen($string) === 8);
         return $string;
     }
-    
+
     /**
      * Unpacks a 64 bit double from an 8 byte string.
      *
@@ -38,11 +39,11 @@ final class DoublePacker
     public static function unpack($string)
     {
         if (strlen($string) !== 8) {
-            throw new StorageException("The string is not 64 bit long.");
+            throw new StorageException('The string is not 64 bit long.');
         }
-        $unpack = unpack("d", $string);
-        if (!is_array($unpack) || !array_key_exists(1, $unpack)) {
-            throw new StorageException("Could not unpack string.");
+        $unpack = unpack('d', $string);
+        if (! is_array($unpack) || ! array_key_exists(1, $unpack)) {
+            throw new StorageException('Could not unpack string.');
         }
         return $unpack[1];
     }

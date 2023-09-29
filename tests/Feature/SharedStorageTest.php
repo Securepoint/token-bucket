@@ -1,5 +1,6 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Redis;
@@ -67,35 +68,35 @@ class SharedStorageTest extends TestCase
             }],
 
             [function ($name) {
-                $pdo = new \PDO("sqlite::memory:");
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                $pdo = new PDO("sqlite::memory:");
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return new PDOStorage($name, $pdo);
             }],
         ];
         
         if (getenv("MYSQL_DSN")) {
             $cases[] = [function ($name) {
-                $pdo = new \PDO(getenv("MYSQL_DSN"), getenv("MYSQL_USER"));
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+                $pdo = new PDO(getenv("MYSQL_DSN"), getenv("MYSQL_USER"));
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
                 
                 $storage = new PDOStorage($name, $pdo);
                 
-                $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, true);
+                $pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, true);
                 
                 return $storage;
             }];
         }
         if (getenv("PGSQL_DSN")) {
             $cases[] = [function ($name) {
-                $pdo = new \PDO(getenv("PGSQL_DSN"), getenv("PGSQL_USER"));
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                $pdo = new PDO(getenv("PGSQL_DSN"), getenv("PGSQL_USER"));
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return new PDOStorage($name, $pdo);
             }];
         }
         if (getenv("MEMCACHE_HOST")) {
             $cases[] = [function ($name) {
-                $memcached = new \Memcached();
+                $memcached = new Memcached();
                 $memcached->addServer(getenv("MEMCACHE_HOST"), 11211);
                 return new MemcachedStorage($name, $memcached);
             }];
@@ -121,9 +122,9 @@ class SharedStorageTest extends TestCase
      *
      * @param callable $factory The Storage factory.
      *
-     * @dataProvider provideStorageFactories
      * @test
      */
+    #[DataProvider('provideStorageFactories')]
     public function testStoragesDontInterfere(callable $factory)
     {
         $storageA = call_user_func($factory, "A");

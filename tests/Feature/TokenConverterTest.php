@@ -1,8 +1,9 @@
 <?php
 
+use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Securepoint\TokenBucket\Rate;
-use phpmock\phpunit\PHPMock;
 use Securepoint\TokenBucket\Util\TokenConverter;
 
 /**
@@ -11,29 +12,29 @@ use Securepoint\TokenBucket\Util\TokenConverter;
  * @author Markus Malkusch <markus@malkusch.de>
  * @link bitcoin:1335STSwu9hST4vcMRppEPgENMHD2r1REK Donations
  * @license WTFPL
- * @see TokenConverter
+ * @see  TokenConverter
  */
 class TokenConverterTest extends TestCase
 {
 
     use PHPMock;
-    
+
     /**
      * Tests convertSecondsToTokens().
      *
-     * @param int    $expected The expected tokens.
-     * @param double $seconds  The seconds.
-     * @param Rate   $rate     The rate.
+     * @param int $expected The expected tokens.
+     * @param double $seconds The seconds.
+     * @param Rate $rate The rate.
      *
      * @test
-     * @dataProvider provideTestConvertSecondsToTokens
      */
+    #[DataProvider('provideTestConvertSecondsToTokens')]
     public function testConvertSecondsToTokens($expected, $seconds, Rate $rate)
     {
         $converter = new TokenConverter($rate);
         $this->assertEquals($expected, $converter->convertSecondsToTokens($seconds));
     }
-    
+
     /**
      * Provides test cases for testConvertSecondsToTokens().
      *
@@ -43,7 +44,7 @@ class TokenConverterTest extends TestCase
     {
         return [
             [0, 0.9, new Rate(1, Rate::SECOND)],
-            [1, 1,   new Rate(1, Rate::SECOND)],
+            [1, 1, new Rate(1, Rate::SECOND)],
             [1, 1.1, new Rate(1, Rate::SECOND)],
 
             [1000, 1, new Rate(1, Rate::MILLISECOND)],
@@ -54,23 +55,23 @@ class TokenConverterTest extends TestCase
             [1, 61, new Rate(1, Rate::MINUTE)],
         ];
     }
-    
+
     /**
      * Tests convertTokensToSeconds().
      *
      * @param double $expected The expected seconds.
-     * @param int    $tokens   The tokens.
-     * @param Rate   $rate     The rate.
+     * @param int $tokens The tokens.
+     * @param Rate $rate The rate.
      *
      * @test
-     * @dataProvider provideTestconvertTokensToSeconds
      */
+    #[DataProvider('provideTestconvertTokensToSeconds')]
     public function testconvertTokensToSeconds($expected, $tokens, Rate $rate)
     {
         $converter = new TokenConverter($rate);
         $this->assertEquals($expected, $converter->convertTokensToSeconds($tokens));
     }
-    
+
     /**
      * Provides test cases for testconvertTokensToSeconds().
      *
@@ -85,17 +86,17 @@ class TokenConverterTest extends TestCase
             [2, 2, new Rate(1, Rate::SECOND)],
         ];
     }
-    
+
     /**
      * Tests convertTokensToMicrotime().
      *
-     * @param double $delta  The expected delta.
-     * @param int    $tokens The tokens.
-     * @param Rate   $rate   The rate.
+     * @param double $delta The expected delta.
+     * @param int $tokens The tokens.
+     * @param Rate $rate The rate.
      *
      * @test
-     * @dataProvider provideTestConvertTokensToMicrotime
      */
+    #[DataProvider('provideTestConvertTokensToMicrotime')]
     public function testConvertTokensToMicrotime($delta, $tokens, Rate $rate)
     {
         $microtime = $this->getFunctionMock(__NAMESPACE__, "microtime");
@@ -105,7 +106,7 @@ class TokenConverterTest extends TestCase
 
         $this->assertEquals(microtime(true) + $delta, $converter->convertTokensToMicrotime($tokens));
     }
-    
+
     /**
      * Provides test cases for testConvertTokensToMicrotime().
      *

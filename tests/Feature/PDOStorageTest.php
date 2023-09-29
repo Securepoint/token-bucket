@@ -1,5 +1,7 @@
 <?php
 
+use Securepoint\TokenBucket\Storage\StorageException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Securepoint\TokenBucket\Storage\Storage;
 
@@ -40,19 +42,19 @@ class PDOStorageTest extends TestCase
     public function providePDO()
     {
         $cases = [
-            [new \PDO("sqlite::memory:")],
+            [new PDO("sqlite::memory:")],
         ];
         if (getenv("MYSQL_DSN")) {
-            $pdo = new \PDO(getenv("MYSQL_DSN"), getenv("MYSQL_USER"));
-            $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+            $pdo = new PDO(getenv("MYSQL_DSN"), getenv("MYSQL_USER"));
+            $pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
             $cases[] = [$pdo];
         }
         if (getenv("PGSQL_DSN")) {
-            $pdo = new \PDO(getenv("PGSQL_DSN"), getenv("PGSQL_USER"));
+            $pdo = new PDO(getenv("PGSQL_DSN"), getenv("PGSQL_USER"));
             $cases[] = [$pdo];
         }
         foreach ($cases as $case) {
-            $case[0]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $case[0]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         return $cases;
     }
@@ -61,12 +63,12 @@ class PDOStorageTest extends TestCase
      * Tests instantiation with a too long name should fail.
      *
      * @test
-     * @expectedException \LengthException
      */
     public function testTooLongNameFails()
     {
-        $pdo = new \PDO("sqlite::memory:");
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->expectException(LengthException::class);
+        $pdo = new PDO("sqlite::memory:");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         new PDOStorage(str_repeat(" ", 129), $pdo);
     }
 
@@ -77,8 +79,8 @@ class PDOStorageTest extends TestCase
      */
     public function testLongName()
     {
-        $pdo = new \PDO("sqlite::memory:");
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo = new PDO("sqlite::memory:");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         new PDOStorage(str_repeat(" ", 128), $pdo);
     }
 
@@ -87,13 +89,13 @@ class PDOStorageTest extends TestCase
      *
      * @param int $errorMode The invalid error mode.
      * @test
-     * @expectedException \InvalidArgumentException
-     * @dataProvider provideTestInvalidErrorMode
      */
+    #[DataProvider('provideTestInvalidErrorMode')]
     public function testInvalidErrorMode($errorMode)
     {
-        $pdo = new \PDO("sqlite::memory:");
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, $errorMode);
+        $this->expectException(InvalidArgumentException::class);
+        $pdo = new PDO("sqlite::memory:");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, $errorMode);
         new PDOStorage("test", $pdo);
     }
 
@@ -105,8 +107,8 @@ class PDOStorageTest extends TestCase
     public function provideTestInvalidErrorMode()
     {
         return [
-            [\PDO::ERRMODE_SILENT],
-            [\PDO::ERRMODE_WARNING],
+            [PDO::ERRMODE_SILENT],
+            [PDO::ERRMODE_WARNING],
         ];
     }
 
@@ -117,19 +119,19 @@ class PDOStorageTest extends TestCase
      */
     public function testValidErrorMode()
     {
-        $pdo = new \PDO("sqlite::memory:");
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo = new PDO("sqlite::memory:");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         new PDOStorage("test", $pdo);
     }
 
     /**
      * Tests bootstrap() adds a row to an existing table.
      *
-     * @param \PDO $pdo The PDO.
-     * @dataProvider providePDO
+     * @param PDO $pdo The PDO.
      * @test
      */
-    public function testBootstrapAddsRow(\PDO $pdo)
+    #[DataProvider('providePDO')]
+    public function testBootstrapAddsRow(PDO $pdo)
     {
         $storageA = new PDOStorage("A", $pdo);
         $storageA->bootstrap(1);
@@ -146,13 +148,13 @@ class PDOStorageTest extends TestCase
     /**
      * Tests bootstrap() would add a row to an existing table, but fails.
      *
-     * @param \PDO $pdo The PDO.
-     * @dataProvider providePDO
+     * @param PDO $pdo The PDO.
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
-    public function testBootstrapFailsForExistingRow(\PDO $pdo)
+    #[DataProvider('providePDO')]
+    public function testBootstrapFailsForExistingRow(PDO $pdo)
     {
+        $this->expectException(StorageException::class);
         $storageA = new PDOStorage("A", $pdo);
         $storageA->bootstrap(0);
         $this->storages[] = $storageA;
@@ -164,11 +166,11 @@ class PDOStorageTest extends TestCase
     /**
      * Tests remove() removes only one row.
      *
-     * @param \PDO $pdo The PDO.
-     * @dataProvider providePDO
+     * @param PDO $pdo The PDO.
      * @test
      */
-    public function testRemoveOneRow(\PDO $pdo)
+    #[DataProvider('providePDO')]
+    public function testRemoveOneRow(PDO $pdo)
     {
         $storageA = new PDOStorage("A", $pdo);
         $storageA->bootstrap(0);
@@ -185,11 +187,11 @@ class PDOStorageTest extends TestCase
     /**
      * Tests remove() removes the table after the last row.
      *
-     * @param \PDO $pdo The PDO.
-     * @dataProvider providePDO
+     * @param PDO $pdo The PDO.
      * @test
      */
-    public function testRemoveTable(\PDO $pdo)
+    #[DataProvider('providePDO')]
+    public function testRemoveTable(PDO $pdo)
     {
         $storage = new PDOStorage("test", $pdo);
         $storage->bootstrap(0);

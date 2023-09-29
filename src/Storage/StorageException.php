@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Storage;
 
 use Securepoint\TokenBucket\TokenBucketException;
@@ -13,5 +15,4 @@ use Securepoint\TokenBucket\TokenBucketException;
  */
 final class StorageException extends TokenBucketException
 {
-
 }

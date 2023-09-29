@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Storage;
 
 use malkusch\lock\mutex\FlockMutex;
@@ -19,22 +21,21 @@ use Securepoint\TokenBucket\Util\DoublePacker;
  */
 final class FileStorage implements Storage, GlobalScope
 {
- 
     /**
      * @var Mutex The mutex.
      */
     private $mutex;
-    
+
     /**
      * @var resource The file handle.
      */
     private $fileHandle;
-    
+
     /**
      * @var string The file path.
      */
     private $path;
-    
+
     /**
      * Sets the file path and opens it.
      *
@@ -49,7 +50,7 @@ final class FileStorage implements Storage, GlobalScope
         $this->path = $path;
         $this->open();
     }
-    
+
     /**
      * Opens the file and initializes the mutex.
      *
@@ -57,13 +58,13 @@ final class FileStorage implements Storage, GlobalScope
      */
     private function open()
     {
-        $this->fileHandle = fopen($this->path, "c+");
-        if (!is_resource($this->fileHandle)) {
-            throw new StorageException("Could not open '$this->path'.");
+        $this->fileHandle = fopen($this->path, 'c+');
+        if (! is_resource($this->fileHandle)) {
+            throw new StorageException("Could not open '{$this->path}'.");
         }
         $this->mutex = new FlockMutex($this->fileHandle);
     }
-    
+
     /**
      * Closes the file handle.
      *
@@ -73,27 +74,27 @@ final class FileStorage implements Storage, GlobalScope
     {
         fclose($this->fileHandle);
     }
-    
+
     public function isBootstrapped()
     {
         $stats = fstat($this->fileHandle);
-        return $stats["size"] > 0;
+        return $stats['size'] > 0;
     }
-    
+
     public function bootstrap($microtime)
     {
         $this->open(); // remove() could have deleted the file.
         $this->setMicrotime($microtime);
     }
-    
+
     public function remove()
     {
         // Truncate to notify isBootstrapped() about the new state.
-        if (!ftruncate($this->fileHandle, 0)) {
-            throw new StorageException("Could not truncate $this->path");
+        if (! ftruncate($this->fileHandle, 0)) {
+            throw new StorageException("Could not truncate {$this->path}");
         }
-        if (!unlink($this->path)) {
-            throw new StorageException("Could not delete $this->path");
+        if (! unlink($this->path)) {
+            throw new StorageException("Could not delete {$this->path}");
         }
     }
 
@@ -103,32 +104,32 @@ final class FileStorage implements Storage, GlobalScope
     public function setMicrotime($microtime)
     {
         if (fseek($this->fileHandle, 0) !== 0) {
-            throw new StorageException("Could not move to beginning of the file.");
+            throw new StorageException('Could not move to beginning of the file.');
         }
-        
+
         $data = DoublePacker::pack($microtime);
         $result = fwrite($this->fileHandle, $data, strlen($data));
         if ($result !== strlen($data)) {
-            throw new StorageException("Could not write to storage.");
+            throw new StorageException('Could not write to storage.');
         }
     }
-    
+
     /**
      * @SuppressWarnings(PHPMD)
      */
     public function getMicrotime()
     {
         if (fseek($this->fileHandle, 0) !== 0) {
-            throw new StorageException("Could not move to beginning of the file.");
+            throw new StorageException('Could not move to beginning of the file.');
         }
         $data = fread($this->fileHandle, 8);
         if ($data === false) {
-            throw new StorageException("Could not read from storage.");
+            throw new StorageException('Could not read from storage.');
         }
-        
+
         return DoublePacker::unpack($data);
     }
-    
+
     public function getMutex()
     {
         return $this->mutex;

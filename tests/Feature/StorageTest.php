@@ -1,5 +1,6 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Redis;
@@ -66,8 +67,8 @@ class StorageTest extends TestCase
                 return new FileStorage(vfsStream::url("fileStorage/data"));
             }],
             "sqlite" => [function () {
-                $pdo = new \PDO("sqlite::memory:");
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                $pdo = new PDO("sqlite::memory:");
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return new PDOStorage("test", $pdo);
             }],
             "IPCStorage" => [function () {
@@ -77,22 +78,22 @@ class StorageTest extends TestCase
 
         if (getenv("MYSQL_DSN")) {
             $cases["MYSQL"] = [function () {
-                $pdo = new \PDO(getenv("MYSQL_DSN"), getenv("MYSQL_USER"));
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+                $pdo = new PDO(getenv("MYSQL_DSN"), getenv("MYSQL_USER"));
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
                 return new PDOStorage("test", $pdo);
             }];
         }
         if (getenv("PGSQL_DSN")) {
             $cases["PGSQL"] = [function () {
-                $pdo = new \PDO(getenv("PGSQL_DSN"), getenv("PGSQL_USER"));
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                $pdo = new PDO(getenv("PGSQL_DSN"), getenv("PGSQL_USER"));
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return new PDOStorage("test", $pdo);
             }];
         }
         if (getenv("MEMCACHE_HOST")) {
             $cases["MemcachedStorage"] = [function () {
-                $memcached = new \Memcached();
+                $memcached = new Memcached();
                 $memcached->addServer(getenv("MEMCACHE_HOST"), 11211);
                 return new MemcachedStorage("test", $memcached);
             }];
@@ -118,8 +119,8 @@ class StorageTest extends TestCase
      *
      * @param callable $storageFactory Returns a storage.
      * @test
-     * @dataProvider provideStorageFactories
      */
+    #[DataProvider('provideStorageFactories')]
     public function testSetAndGetMicrotime(callable $storageFactory)
     {
         $this->storage = call_user_func($storageFactory);
@@ -142,8 +143,8 @@ class StorageTest extends TestCase
      *
      * @param callable $storageFactory Returns a storage.
      * @test
-     * @dataProvider provideStorageFactories
      */
+    #[DataProvider('provideStorageFactories')]
     public function testBootstrap(callable $storageFactory)
     {
         $this->storage = call_user_func($storageFactory);
@@ -158,8 +159,8 @@ class StorageTest extends TestCase
      *
      * @param callable $storageFactory Returns a storage.
      * @test
-     * @dataProvider provideStorageFactories
      */
+    #[DataProvider('provideStorageFactories')]
     public function testIsBootstrapped(callable $storageFactory)
     {
         $this->storage = call_user_func($storageFactory);
@@ -177,8 +178,8 @@ class StorageTest extends TestCase
      *
      * @param callable $storageFactory Returns a storage.
      * @test
-     * @dataProvider provideStorageFactories
      */
+    #[DataProvider('provideStorageFactories')]
     public function testRemove(callable $storageFactory)
     {
         $this->storage = call_user_func($storageFactory);
@@ -193,8 +194,8 @@ class StorageTest extends TestCase
      *
      * @param callable $storageFactory Returns a storage.
      * @test
-     * @dataProvider provideStorageFactories
      */
+    #[DataProvider('provideStorageFactories')]
     public function testConsumingUnavailableTokensReturnsFalse(callable $storageFactory)
     {
         $this->storage = call_user_func($storageFactory);
@@ -211,8 +212,8 @@ class StorageTest extends TestCase
      *
      * @param callable $storageFactory Returns a storage.
      * @test
-     * @dataProvider provideStorageFactories
      */
+    #[DataProvider('provideStorageFactories')]
     public function testConsumingAvailableTokensReturnsTrue(callable $storageFactory)
     {
         $this->storage = call_user_func($storageFactory);
@@ -229,8 +230,8 @@ class StorageTest extends TestCase
      *
      * @param callable $storageFactory Returns a storage.
      * @test
-     * @dataProvider provideStorageFactories
      */
+    #[DataProvider('provideStorageFactories')]
     public function testSynchronizedBootstrap(callable $storageFactory)
     {
         $this->storage = call_user_func($storageFactory);

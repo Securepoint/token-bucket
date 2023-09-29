@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Storage;
 
 use malkusch\lock\mutex\Mutex;
@@ -18,17 +20,16 @@ use Securepoint\TokenBucket\Storage\Scope\RequestScope;
  */
 final class SingleProcessStorage implements Storage, RequestScope
 {
- 
     /**
      * @var Mutex The mutex.
      */
     private $mutex;
-    
+
     /**
      * @var double The microtime.
      */
     private $microtime;
-    
+
     /**
      * Initialization.
      */
@@ -36,17 +37,17 @@ final class SingleProcessStorage implements Storage, RequestScope
     {
         $this->mutex = new NoMutex();
     }
-    
+
     public function isBootstrapped()
     {
-        return ! is_null($this->microtime);
+        return $this->microtime !== null;
     }
-    
+
     public function bootstrap($microtime)
     {
         $this->setMicrotime($microtime);
     }
-    
+
     public function remove()
     {
         $this->microtime = null;
@@ -56,7 +57,7 @@ final class SingleProcessStorage implements Storage, RequestScope
     {
         $this->microtime = $microtime;
     }
-    
+
     public function getMicrotime()
     {
         return $this->microtime;

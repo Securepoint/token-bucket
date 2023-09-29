@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Storage;
 
 use malkusch\lock\mutex\Mutex;
 use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
-use Securepoint\TokenBucket\Storage\Scope\SessionScope;
 use Securepoint\TokenBucket\Storage\Scope\RequestScope;
+use Securepoint\TokenBucket\Storage\Scope\SessionScope;
 
 /**
  * Token Storage.
@@ -23,7 +25,6 @@ use Securepoint\TokenBucket\Storage\Scope\RequestScope;
  */
 interface Storage
 {
-    
     /**
      * Returns the Mutex for this Storage.
      *
@@ -31,7 +32,7 @@ interface Storage
      * @internal
      */
     public function getMutex();
-    
+
     /**
      * Returns if the Storage was already bootstrapped.
      *
@@ -40,7 +41,7 @@ interface Storage
      * @internal
      */
     public function isBootstrapped();
-    
+
     /**
      * Bootstraps the Storage.
      *
@@ -49,7 +50,7 @@ interface Storage
      * @internal
      */
     public function bootstrap($microtime);
-    
+
     /**
      * Removes the Storage.
      *
@@ -62,7 +63,7 @@ interface Storage
      * @internal
      */
     public function remove();
-    
+
     /**
      * Stores a timestamp.
      *

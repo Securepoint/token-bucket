@@ -1,5 +1,6 @@
 <?php
 
+use Securepoint\TokenBucket\Storage\StorageException;
 use PHPUnit\Framework\TestCase;
 use Securepoint\TokenBucket\Storage\IPCStorage;
 
@@ -18,10 +19,10 @@ class IPCStorageTest extends TestCase
      * Tests building fails for an invalid key.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testBuildFailsForInvalidKey()
     {
+        $this->expectException(StorageException::class);
         @new IPCStorage("invalid");
     }
 
@@ -29,11 +30,11 @@ class IPCStorageTest extends TestCase
      * Tests remove() fails.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
-     * @expectedExceptionMessage Could not release shared memory.
      */
     public function testRemoveFails()
     {
+        $this->expectException(StorageException::class);
+        $this->expectExceptionMessage('Could not release shared memory.');
         $storage = new IPCStorage(ftok(__FILE__, "a"));
         $storage->remove();
         @$storage->remove();
@@ -43,11 +44,11 @@ class IPCStorageTest extends TestCase
      * Tests removing semaphore fails.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
-     * @expectedExceptionMessage Could not remove semaphore.
      */
     public function testfailRemovingSemaphore()
     {
+        $this->expectException(StorageException::class);
+        $this->expectExceptionMessage('Could not remove semaphore.');
         $key     = ftok(__FILE__, "a");
         $storage = new IPCStorage($key);
         
@@ -59,10 +60,10 @@ class IPCStorageTest extends TestCase
      * Tests setMicrotime() fails.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testSetMicrotimeFails()
     {
+        $this->expectException(StorageException::class);
         $storage = new IPCStorage(ftok(__FILE__, "a"));
         $storage->remove();
         @$storage->setMicrotime(123);
@@ -72,10 +73,10 @@ class IPCStorageTest extends TestCase
      * Tests getMicrotime() fails.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testGetMicrotimeFails()
     {
+        $this->expectException(StorageException::class);
         $storage = new IPCStorage(ftok(__FILE__, "b"));
         @$storage->getMicrotime();
     }

@@ -92,3 +92,4 @@ node_modules/*
 composer.lock
 /.phpstan
 .phpunit.cache
+/cache

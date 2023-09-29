@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Storage;
 
 use malkusch\lock\mutex\Mutex;
@@ -20,22 +22,21 @@ use Securepoint\TokenBucket\Storage\Scope\SessionScope;
  */
 final class SessionStorage implements Storage, SessionScope
 {
- 
     /**
      * @var Mutex The mutex.
      */
     private $mutex;
- 
+
     /**
-     * @var String The session key for this bucket.
+     * @var string The session key for this bucket.
      */
     private $key;
-    
+
     /**
      * @internal
      */
-    const SESSION_NAMESPACE = "TokenBucket_";
-    
+    public const SESSION_NAMESPACE = 'TokenBucket_';
+
     /**
      * Sets the bucket's name.
      *
@@ -44,14 +45,14 @@ final class SessionStorage implements Storage, SessionScope
     public function __construct($name)
     {
         $this->mutex = new NoMutex();
-        $this->key   = self::SESSION_NAMESPACE . $name;
+        $this->key = self::SESSION_NAMESPACE . $name;
     }
 
     public function getMutex()
     {
         return $this->mutex;
     }
-    
+
     public function bootstrap($microtime)
     {
         $this->setMicrotime($microtime);

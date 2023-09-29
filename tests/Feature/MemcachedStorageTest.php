@@ -1,5 +1,6 @@
 <?php
 
+use Securepoint\TokenBucket\Storage\StorageException;
 use PHPUnit\Framework\TestCase;
 use Securepoint\TokenBucket\Storage\MemcachedStorage;
 
@@ -17,7 +18,7 @@ class MemcachedStorageTest extends TestCase
 {
 
     /**
-     * @var \Memcached The memcached API.
+     * @var Memcached The memcached API.
      */
     private $memcached;
 
@@ -34,7 +35,7 @@ class MemcachedStorageTest extends TestCase
             $this->markTestSkipped();
             return;
         }
-        $this->memcached = new \Memcached();
+        $this->memcached = new Memcached();
         $this->memcached->addServer(getenv("MEMCACHE_HOST"), 11211);
 
         $this->storage = new MemcachedStorage("test", $this->memcached);
@@ -48,7 +49,7 @@ class MemcachedStorageTest extends TestCase
         if (!getenv("MEMCACHE_HOST")) {
             return;
         }
-        $memcached = new \Memcached();
+        $memcached = new Memcached();
         $memcached->addServer(getenv("MEMCACHE_HOST"), 11211);
         $memcached->flush();
     }
@@ -67,11 +68,11 @@ class MemcachedStorageTest extends TestCase
      * Tests bootstrap() fails.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testBootstrapFails()
     {
-        $storage = new MemcachedStorage("test", new \Memcached());
+        $this->expectException(StorageException::class);
+        $storage = new MemcachedStorage("test", new Memcached());
         $storage->bootstrap(123);
     }
 
@@ -79,10 +80,10 @@ class MemcachedStorageTest extends TestCase
      * Tests isBootstrapped() fails
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testIsBootstrappedFails()
     {
+        $this->expectException(StorageException::class);
         $this->markTestIncomplete();
     }
 
@@ -90,11 +91,11 @@ class MemcachedStorageTest extends TestCase
      * Tests remove() fails
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testRemoveFails()
     {
-        $storage = new MemcachedStorage("test", new \Memcached());
+        $this->expectException(StorageException::class);
+        $storage = new MemcachedStorage("test", new Memcached());
         $storage->remove();
     }
 
@@ -102,10 +103,10 @@ class MemcachedStorageTest extends TestCase
      * Tests setMicrotime() fails if getMicrotime() wasn't called first.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testSetMicrotimeFailsIfGetMicrotimeNotCalledFirst()
     {
+        $this->expectException(StorageException::class);
         $this->storage->setMicrotime(123);
     }
 
@@ -113,10 +114,10 @@ class MemcachedStorageTest extends TestCase
      * Tests setMicrotime() fails.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testSetMicrotimeFails()
     {
+        $this->expectException(StorageException::class);
         $this->storage->getMicrotime();
         $this->memcached->resetServerList();
         $this->storage->setMicrotime(123);
@@ -145,11 +146,11 @@ class MemcachedStorageTest extends TestCase
      * Tests getMicrotime() fails.
      *
      * @test
-     * @expectedException Securepoint\TokenBucket\Storage\StorageException
      */
     public function testGetMicrotimeFails()
     {
-        $storage = new MemcachedStorage("test", new \Memcached());
+        $this->expectException(StorageException::class);
+        $storage = new MemcachedStorage("test", new Memcached());
         $storage->getMicrotime();
     }
 }

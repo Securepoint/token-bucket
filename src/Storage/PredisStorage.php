@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Securepoint\TokenBucket\Storage;
 
-use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
-use Securepoint\TokenBucket\Util\DoublePacker;
+use malkusch\lock\mutex\Mutex;
+use malkusch\lock\mutex\PredisMutex;
 use Predis\Client;
 use Predis\PredisException;
-use malkusch\lock\mutex\PredisMutex;
-use malkusch\lock\mutex\Mutex;
+use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
+use Securepoint\TokenBucket\Util\DoublePacker;
 
 /**
  * Redis based storage which uses the Predis API.
@@ -20,22 +22,21 @@ use malkusch\lock\mutex\Mutex;
  */
 final class PredisStorage implements Storage, GlobalScope
 {
-    
     /**
      * @var Mutex The mutex.
      */
     private $mutex;
-    
+
     /**
      * @var Client The redis API.
      */
     private $redis;
-    
+
     /**
      * @var string The key.
      */
     private $key;
-    
+
     /**
      * Sets the Redis API.
      *
@@ -44,36 +45,36 @@ final class PredisStorage implements Storage, GlobalScope
      */
     public function __construct($name, Client $redis)
     {
-        $this->key   = $name;
+        $this->key = $name;
         $this->redis = $redis;
         $this->mutex = new PredisMutex([$redis], $name);
     }
-    
+
     public function bootstrap($microtime)
     {
         $this->setMicrotime($microtime);
     }
-    
+
     public function isBootstrapped()
     {
         try {
             return (bool) $this->redis->exists($this->key);
         } catch (PredisException $e) {
-            throw new StorageException("Failed to check for key existence", 0, $e);
+            throw new StorageException('Failed to check for key existence', 0, $e);
         }
     }
-    
+
     public function remove()
     {
         try {
-            if (!$this->redis->del($this->key)) {
-                throw new StorageException("Failed to delete key");
+            if (! $this->redis->del($this->key)) {
+                throw new StorageException('Failed to delete key');
             }
         } catch (PredisException $e) {
-            throw new StorageException("Failed to delete key", 0, $e);
+            throw new StorageException('Failed to delete key', 0, $e);
         }
     }
-    
+
     /**
      * @SuppressWarnings(PHPMD)
      */
@@ -81,11 +82,11 @@ final class PredisStorage implements Storage, GlobalScope
     {
         try {
             $data = DoublePacker::pack($microtime);
-            if (!$this->redis->set($this->key, $data)) {
-                throw new StorageException("Failed to store microtime");
+            if (! $this->redis->set($this->key, $data)) {
+                throw new StorageException('Failed to store microtime');
             }
         } catch (PredisException $e) {
-            throw new StorageException("Failed to store microtime", 0, $e);
+            throw new StorageException('Failed to store microtime', 0, $e);
         }
     }
 
@@ -97,11 +98,11 @@ final class PredisStorage implements Storage, GlobalScope
         try {
             $data = $this->redis->get($this->key);
             if ($data === false) {
-                throw new StorageException("Failed to get microtime");
+                throw new StorageException('Failed to get microtime');
             }
             return DoublePacker::unpack($data);
         } catch (PredisException $e) {
-            throw new StorageException("Failed to get microtime", 0, $e);
+            throw new StorageException('Failed to get microtime', 0, $e);
         }
     }
 

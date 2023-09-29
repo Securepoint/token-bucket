@@ -1,12 +1,15 @@
 <?php
 
-namespace bandwidthThrottle\tokenBucket;
-
+use PHPUnit\Framework\Attributes\DataProvider;
+use LengthException;
 use malkusch\lock\mutex\NoMutex;
 use phpmock\environment\SleepEnvironmentBuilder;
 use phpmock\environment\MockEnvironment;
-use bandwidthThrottle\tokenBucket\storage\SingleProcessStorage;
-use bandwidthThrottle\tokenBucket\storage\Storage;
+use PHPUnit\Framework\TestCase;
+use Securepoint\TokenBucket\Rate;
+use Securepoint\TokenBucket\Storage\SingleProcessStorage;
+use Securepoint\TokenBucket\Storage\Storage;
+use Securepoint\TokenBucket\TokenBucket;
 
 /**
  * Test for TokenBucket.
@@ -16,7 +19,7 @@ use bandwidthThrottle\tokenBucket\storage\Storage;
  * @license WTFPL
  * @see TokenBucket
  */
-class TokenBucketTest extends \PHPUnit_Framework_TestCase
+class TokenBucketTest extends TestCase
 {
     
     /**
@@ -24,18 +27,18 @@ class TokenBucketTest extends \PHPUnit_Framework_TestCase
      */
     private $sleepEnvironent;
     
-    protected function setUp()
+    protected function setUp(): void
     {
         $builder = new SleepEnvironmentBuilder();
         $builder->addNamespace(__NAMESPACE__)
-                ->addNamespace("bandwidthThrottle\\tokenBucket\\util")
+                ->addNamespace("Securepoint\\TokenBucket\\Util")
                 ->setTimestamp(1417011228);
 
         $this->sleepEnvironent = $builder->build();
         $this->sleepEnvironent->enable();
     }
     
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->sleepEnvironent->disable();
     }
@@ -85,8 +88,8 @@ class TokenBucketTest extends \PHPUnit_Framework_TestCase
      * @param int $tokens   The initial amount of tokens.
      *
      * @test
-     * @dataProvider provideTestBootstrapWithInitialTokens
      */
+    #[DataProvider('provideTestBootstrapWithInitialTokens')]
     public function testBootstrapWithInitialTokens($capacity, $tokens)
     {
         $rate        = new Rate(1, Rate::SECOND);
@@ -102,7 +105,7 @@ class TokenBucketTest extends \PHPUnit_Framework_TestCase
      *
      * @return int[][] Test cases.
      */
-    public function provideTestBootstrapWithInitialTokens()
+    public static function provideTestBootstrapWithInitialTokens()
     {
         return [
             [10, 1],
@@ -216,10 +219,10 @@ class TokenBucketTest extends \PHPUnit_Framework_TestCase
      * Tests bootstrapping with too many tokens.
      *
      * @test
-     * @expectedException \LengthException
      */
     public function testInitialTokensTooMany()
     {
+        $this->expectException(LengthException::class);
         $rate   = new Rate(1, Rate::SECOND);
         $bucket = new TokenBucket(20, $rate, new SingleProcessStorage());
         $bucket->bootstrap(21);
@@ -229,10 +232,10 @@ class TokenBucketTest extends \PHPUnit_Framework_TestCase
      * Tests consuming more than the capacity.
      *
      * @test
-     * @expectedException \LengthException
      */
     public function testConsumeTooMany()
     {
+        $this->expectException(LengthException::class);
         $rate        = new Rate(1, Rate::SECOND);
         $tokenBucket = new TokenBucket(20, $rate, new SingleProcessStorage());
         $tokenBucket->bootstrap();
@@ -260,11 +263,11 @@ class TokenBucketTest extends \PHPUnit_Framework_TestCase
      * Tests building a token bucket with an invalid caüacity fails.
      *
      * @test
-     * @expectedException InvalidArgumentException
-     * @dataProvider provideTestInvalidCapacity
      */
+    #[DataProvider('provideTestInvalidCapacity')]
     public function testInvalidCapacity($capacity)
     {
+        $this->expectException(InvalidArgumentException::class);
         $rate = new Rate(1, Rate::SECOND);
         new TokenBucket($capacity, $rate, new SingleProcessStorage());
     }
@@ -274,7 +277,7 @@ class TokenBucketTest extends \PHPUnit_Framework_TestCase
      *
      * @return array Test cases.
      */
-    public function provideTestInvalidCapacity()
+    public static function provideTestInvalidCapacity()
     {
         return [
             [0],
@@ -343,7 +346,7 @@ class TokenBucketTest extends \PHPUnit_Framework_TestCase
         try {
             $bucket->consume(11);
             $this->fail("Expected an exception.");
-        } catch (\LengthException $e) {
+        } catch (LengthException $e) {
             // expected
         }
         

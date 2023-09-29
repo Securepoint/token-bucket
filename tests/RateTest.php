@@ -1,6 +1,8 @@
 <?php
 
-namespace bandwidthThrottle\tokenBucket;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Securepoint\TokenBucket\Rate;
 
 /**
  * Test for Rate.
@@ -10,7 +12,7 @@ namespace bandwidthThrottle\tokenBucket;
  * @license WTFPL
  * @see Rate
  */
-class RateTest extends \PHPUnit_Framework_TestCase
+class RateTest extends TestCase
 {
 
     /**
@@ -20,8 +22,8 @@ class RateTest extends \PHPUnit_Framework_TestCase
      * @param Rate   $rate     The rate.
      *
      * @test
-     * @dataProvider provideTestGetTokensPerSecond
      */
+    #[DataProvider('provideTestGetTokensPerSecond')]
     public function testGetTokensPerSecond($expected, Rate $rate)
     {
         $this->assertEquals($expected, $rate->getTokensPerSecond());
@@ -32,7 +34,7 @@ class RateTest extends \PHPUnit_Framework_TestCase
      *
      * @return array Test cases.
      */
-    public function provideTestGetTokensPerSecond()
+    public static function provideTestGetTokensPerSecond()
     {
         return [
             [1/60/60/24/365, new Rate(1, Rate::YEAR)],
@@ -60,10 +62,10 @@ class RateTest extends \PHPUnit_Framework_TestCase
      * Tests building a rate with an invalid unit fails.
      *
      * @test
-     * @expectedException InvalidArgumentException
      */
     public function testInvalidUnit()
     {
+        $this->expectException(InvalidArgumentException::class);
         new Rate(1, "invalid");
     }
 
@@ -71,11 +73,11 @@ class RateTest extends \PHPUnit_Framework_TestCase
      * Tests building a rate with an invalid amount fails.
      *
      * @test
-     * @expectedException InvalidArgumentException
-     * @dataProvider provideTestInvalidAmount
      */
+    #[DataProvider('provideTestInvalidAmount')]
     public function testInvalidAmount($amount)
     {
+        $this->expectException(InvalidArgumentException::class);
         new Rate($amount, Rate::SECOND);
     }
 
@@ -84,7 +86,7 @@ class RateTest extends \PHPUnit_Framework_TestCase
      *
      * @return array Test cases.
      */
-    public function provideTestInvalidAmount()
+    public static function provideTestInvalidAmount()
     {
         return [
             [0],
