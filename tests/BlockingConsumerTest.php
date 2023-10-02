@@ -33,6 +33,7 @@ class BlockingConsumerTest extends TestCase
     {
         $builder = new SleepEnvironmentBuilder();
         $builder->addNamespace(__NAMESPACE__)
+            ->addNamespace('Securepoint\\TokenBucket')
             ->addNamespace('Securepoint\\TokenBucket\\Util')
             ->setTimestamp(1417011228);
 
@@ -141,6 +142,7 @@ class BlockingConsumerTest extends TestCase
      */
     public function testConsumeShouldNotFailBeforeTimeout()
     {
+        $this->expectNotToPerformAssertions();
         $rate = new Rate(0.1, Rate::SECOND);
         $bucket = new TokenBucket(1, $rate, new SingleProcessStorage());
         $bucket->bootstrap(0);
@@ -154,6 +156,7 @@ class BlockingConsumerTest extends TestCase
      */
     public function testConsumeWithoutTimeoutShouldNeverFail()
     {
+        $this->expectNotToPerformAssertions();
         $rate = new Rate(0.1, Rate::YEAR);
         $bucket = new TokenBucket(1, $rate, new SingleProcessStorage());
         $bucket->bootstrap(0);

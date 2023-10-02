@@ -96,7 +96,11 @@ class TokenConverterTest extends TestCase
     #[DataProvider('provideTestConvertTokensToMicrotime')]
     public function testConvertTokensToMicrotime($delta, $tokens, Rate $rate)
     {
-        $microtime = $this->getFunctionMock(__NAMESPACE__, 'microtime');
+        $microtime = $this->getFunctionMock('Securepoint\\TokenBucket\\Util', 'microtime');
+        $microtime->expects($this->any())
+            ->willReturn(100000);
+
+        $microtime = $this->getFunctionMock('Securepoint\\TokenBucket\\Tests\\Feature', 'microtime');
         $microtime->expects($this->any())
             ->willReturn(100000);
 
