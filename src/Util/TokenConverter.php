@@ -78,7 +78,7 @@ final class TokenConverter
      */
     public function convertMicrotimeToTokens($microtime)
     {
-        $delta = bcsub(microtime(true), $microtime, $this->bcScale);
+        $delta = bcsub((string)microtime(true), (string)$microtime, $this->bcScale);
         return $this->convertSecondsToTokens($delta);
     }
 }
