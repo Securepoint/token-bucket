@@ -38,12 +38,12 @@ class RateTest extends TestCase
     public static function provideTestGetTokensPerSecond(): array
     {
         return [
-            [1 / 60 / 60 / 24 / 365, new Rate(1, Rate::YEAR)],
-            [2 / 60 / 60 / 24 / 365, new Rate(2, Rate::YEAR)],
+            [1 / 31556926, new Rate(1, Rate::YEAR)],
+            [2 / 31556926, new Rate(2, Rate::YEAR)],
             [1 / 2629743.83, new Rate(1, Rate::MONTH)],
             [2 / 2629743.83, new Rate(2, Rate::MONTH)],
-            [1 / 60 / 60 / 24 / 7, new Rate(1, Rate::WEEK)],
-            [2 / 60 / 60 / 24 / 7, new Rate(2, Rate::WEEK)],
+            [1 / 604800, new Rate(1, Rate::WEEK)],
+            [2 / 604800, new Rate(2, Rate::WEEK)],
             [1 / 60 / 60 / 24, new Rate(1, Rate::DAY)],
             [2 / 60 / 60 / 24, new Rate(2, Rate::DAY)],
             [1 / 60 / 60, new Rate(1, Rate::HOUR)],
