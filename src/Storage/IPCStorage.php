@@ -72,7 +72,7 @@ final class IPCStorage implements Storage, GlobalScope
             throw new StorageException('Could not get semaphore id.', 0, $e);
         }
 
-        if (!$this->memory = shm_attach($this->key, 128)) {
+        if (! $this->memory = shm_attach($this->key, 128)) {
             throw new StorageException('Failed to attach to shared memory.');
         }
     }

@@ -7,7 +7,6 @@ namespace Securepoint\TokenBucket;
 use InvalidArgumentException;
 use LengthException;
 use Securepoint\TokenBucket\Storage\StorageException;
-use Securepoint\TokenBucket\TokenBucket;
 
 /**
  * Blocking token bucket consumer.
