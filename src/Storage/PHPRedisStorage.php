@@ -26,17 +26,7 @@ final class PHPRedisStorage implements Storage, GlobalScope
     /**
      * @var Mutex The mutex.
      */
-    private $mutex;
-
-    /**
-     * @var Redis The redis API.
-     */
-    private $redis;
-
-    /**
-     * @var string The key.
-     */
-    private $key;
+    private readonly PHPRedisMutex $mutex;
 
     /**
      * Sets the connected Redis API.
@@ -44,14 +34,12 @@ final class PHPRedisStorage implements Storage, GlobalScope
      * The Redis API needs to be connected yet. I.e. Redis::connect() was
      * called already.
      *
-     * @param string $name  The resource name.
+     * @param string $key The resource name.
      * @param Redis  $redis The Redis API.
      */
-    public function __construct($name, Redis $redis)
+    public function __construct(private $key, private readonly Redis $redis)
     {
-        $this->key = $name;
-        $this->redis = $redis;
-        $this->mutex = new PHPRedisMutex([$redis], $name);
+        $this->mutex = new PHPRedisMutex([$redis], $key);
     }
 
     public function bootstrap($microtime)

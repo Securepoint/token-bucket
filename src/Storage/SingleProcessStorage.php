@@ -22,7 +22,7 @@ final class SingleProcessStorage implements Storage, RequestScope
     /**
      * @var Mutex The mutex.
      */
-    private $mutex;
+    private readonly NoMutex $mutex;
 
     /**
      * @var double The microtime.

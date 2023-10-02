@@ -24,12 +24,12 @@ class PHPRedisStorageTest extends TestCase
     /**
      * @var Redis The API.
      */
-    private $redis;
+    private Redis $redis;
 
     /**
      * @var PHPRedisStorage The SUT.
      */
-    private $storage;
+    private PHPRedisStorage $storage;
 
     protected function setUp(): void
     {

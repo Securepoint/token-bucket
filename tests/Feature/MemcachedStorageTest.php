@@ -23,12 +23,12 @@ class MemcachedStorageTest extends TestCase
     /**
      * @var Memcached The memcached API.
      */
-    private $memcached;
+    private Memcached $memcached;
 
     /**
      * @var MemcachedStorage The SUT.
      */
-    private $storage;
+    private MemcachedStorage $storage;
 
     protected function setUp(): void
     {
@@ -78,7 +78,7 @@ class MemcachedStorageTest extends TestCase
     /**
      * Tests isBootstrapped() fails
      */
-    public function testIsBootstrappedFails()
+    public function testIsBootstrappedFails(): never
     {
         $this->expectException(StorageException::class);
         $this->markTestIncomplete();

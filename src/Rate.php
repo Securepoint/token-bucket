@@ -27,7 +27,7 @@ final class Rate
     /**
      * @var double[] Mapping between units and seconds
      */
-    private static $unitMap = [
+    private static array $unitMap = [
         self::MICROSECOND => 0.000001,
         self::MILLISECOND => 0.001,
         self::SECOND => 1,

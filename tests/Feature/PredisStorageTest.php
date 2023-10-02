@@ -25,12 +25,12 @@ class PredisStorageTest extends TestCase
     /**
      * @var Client The API.
      */
-    private $redis;
+    private Client $redis;
 
     /**
      * @var PredisStorage The SUT.
      */
-    private $storage;
+    private PredisStorage $storage;
 
     protected function setUp(): void
     {

@@ -26,22 +26,17 @@ final class IPCStorage implements Storage, GlobalScope
     /**
      * @var Mutex The mutex.
      */
-    private $mutex;
-
-    /**
-     * @var int The System V IPC key.
-     */
-    private int $key;
+    private ?SemaphoreMutex $mutex = null;
 
     /**
      * @var resource The shared memory.
      */
-    private ?SysvSharedMemory $memory;
+    private ?SysvSharedMemory $memory = null;
 
     /**
      * @var resource The semaphore id.
      */
-    private ?SysvSemaphore $semaphore;
+    private ?SysvSemaphore $semaphore = null;
 
     /**
      * Sets the System V IPC key for the shared memory and its semaphore.
@@ -52,9 +47,8 @@ final class IPCStorage implements Storage, GlobalScope
      *
      * @throws StorageException Could initialize IPC infrastructure.
      */
-    public function __construct(int $key)
+    public function __construct(private readonly int $key)
     {
-        $this->key = $key;
         $this->attach();
     }
 

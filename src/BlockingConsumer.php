@@ -17,11 +17,6 @@ use Securepoint\TokenBucket\Storage\StorageException;
 final class BlockingConsumer
 {
     /**
-     * @var TokenBucket The token bucket.
-     */
-    private $bucket;
-
-    /**
      * @var int|null optional timeout in seconds.
      */
     private $timeout;
@@ -32,10 +27,8 @@ final class BlockingConsumer
      * @param TokenBucket $bucket The token bucket.
      * @param int|null $timeout Optional timeout in seconds.
      */
-    public function __construct(TokenBucket $bucket, $timeout = null)
+    public function __construct(private readonly TokenBucket $bucket, $timeout = null)
     {
-        $this->bucket = $bucket;
-
         if ($timeout < 0) {
             throw new InvalidArgumentException('Timeout must be null or positive');
         }

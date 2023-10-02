@@ -23,17 +23,12 @@ final class FileStorage implements Storage, GlobalScope
     /**
      * @var Mutex The mutex.
      */
-    private $mutex;
+    private FlockMutex $mutex;
 
     /**
      * @var resource The file handle.
      */
     private $fileHandle;
-
-    /**
-     * @var string The file path.
-     */
-    private $path;
 
     /**
      * Sets the file path and opens it.
@@ -44,9 +39,8 @@ final class FileStorage implements Storage, GlobalScope
      * @param string $path The file path.
      * @throws StorageException Failed to open the file.
      */
-    public function __construct($path)
+    public function __construct(private $path)
     {
-        $this->path = $path;
         $this->open();
     }
 

@@ -24,12 +24,12 @@ final class SessionStorage implements Storage, SessionScope
     /**
      * @var Mutex The mutex.
      */
-    private $mutex;
+    private readonly NoMutex $mutex;
 
     /**
      * @var string The session key for this bucket.
      */
-    private $key;
+    private readonly string $key;
 
     /**
      * @internal

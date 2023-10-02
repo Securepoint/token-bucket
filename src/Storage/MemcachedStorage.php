@@ -19,11 +19,6 @@ use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
 final class MemcachedStorage implements Storage, GlobalScope
 {
     /**
-     * @var Memcached The memcached API.
-     */
-    private $memcached;
-
-    /**
      * @var float The CAS token.
      */
     private $casToken;
@@ -31,12 +26,12 @@ final class MemcachedStorage implements Storage, GlobalScope
     /**
      * @var string The key for the token bucket.
      */
-    private $key;
+    private readonly string $key;
 
     /**
      * @var CASMutex The mutex for this storage.
      */
-    private $mutex;
+    private readonly CASMutex $mutex;
 
     /**
      * @internal
@@ -52,11 +47,10 @@ final class MemcachedStorage implements Storage, GlobalScope
      * @param string     $name      The name of the shared token bucket.
      * @param Memcached $memcached The memcached API.
      */
-    public function __construct($name, Memcached $memcached)
+    public function __construct($name, private readonly Memcached $memcached)
     {
         $this->key = self::PREFIX . $name;
         $this->mutex = new CASMutex();
-        $this->memcached = $memcached;
     }
 
     public function bootstrap($microtime)

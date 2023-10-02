@@ -60,12 +60,8 @@ class StorageTest extends TestCase
     public static function provideStorageFactories()
     {
         $cases = [
-            'SingleProcessStorage' => [function () {
-                return new SingleProcessStorage();
-            }],
-            'SessionStorage' => [function () {
-                return new SessionStorage('test');
-            }],
+            'SingleProcessStorage' => [fn() => new SingleProcessStorage()],
+            'SessionStorage' => [fn() => new SessionStorage('test')],
             'FileStorage' => [function () {
                 vfsStream::setup('fileStorage');
                 return new FileStorage(vfsStream::url('fileStorage/data'));
@@ -75,9 +71,7 @@ class StorageTest extends TestCase
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return new PDOStorage('test', $pdo);
             }],
-            'IPCStorage' => [function () {
-                return new IPCStorage(ftok(__FILE__, 'a'));
-            }],
+            'IPCStorage' => [fn() => new IPCStorage(ftok(__FILE__, 'a'))],
         ];
 
         if (getenv('MYSQL_DSN')) {

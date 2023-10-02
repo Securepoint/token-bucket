@@ -44,7 +44,7 @@ class SharedStorageTest extends TestCase
         foreach ($this->storages as $storage) {
             try {
                 @$storage->remove();
-            } catch (StorageException $e) {
+            } catch (StorageException) {
                 // ignore missing vfsStream files.
             }
         }
@@ -58,9 +58,7 @@ class SharedStorageTest extends TestCase
     public static function provideStorageFactories()
     {
         $cases = [
-            [function ($name) {
-                return new SessionStorage($name);
-            }],
+            [fn($name) => new SessionStorage($name)],
 
             [function ($name) {
                 vfsStream::setup('fileStorage');

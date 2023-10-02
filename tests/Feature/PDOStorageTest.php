@@ -31,7 +31,7 @@ class PDOStorageTest extends TestCase
     /**
      * @var Storage[] The tested storages;
      */
-    private $storages = [];
+    private array $storages = [];
 
     protected function tearDown(): void
     {

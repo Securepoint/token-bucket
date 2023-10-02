@@ -16,23 +16,17 @@ use Securepoint\TokenBucket\Rate;
 final class TokenConverter
 {
     /**
-     * @var Rate The rate.
-     */
-    private $rate;
-
-    /**
      * @var int precision scale for bc_* operations.
      */
-    private $bcScale = 8;
+    private int $bcScale = 8;
 
     /**
      * Sets the token rate.
      *
      * @param int $rate The rate.
      */
-    public function __construct(Rate $rate)
+    public function __construct(private readonly Rate $rate)
     {
-        $this->rate = $rate;
     }
 
     /**

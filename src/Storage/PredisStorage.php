@@ -24,29 +24,17 @@ final class PredisStorage implements Storage, GlobalScope
     /**
      * @var Mutex The mutex.
      */
-    private $mutex;
-
-    /**
-     * @var Client The redis API.
-     */
-    private $redis;
-
-    /**
-     * @var string The key.
-     */
-    private $key;
+    private readonly PredisMutex $mutex;
 
     /**
      * Sets the Redis API.
      *
-     * @param string $name  The resource name.
+     * @param string $key The resource name.
      * @param Client $redis The Redis API.
      */
-    public function __construct($name, Client $redis)
+    public function __construct(private $key, private readonly Client $redis)
     {
-        $this->key = $name;
-        $this->redis = $redis;
-        $this->mutex = new PredisMutex([$redis], $name);
+        $this->mutex = new PredisMutex([$redis], $key);
     }
 
     public function bootstrap($microtime)

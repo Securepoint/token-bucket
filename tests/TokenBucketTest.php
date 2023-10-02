@@ -312,7 +312,7 @@ class TokenBucketTest extends TestCase
         try {
             $bucket->consume(11);
             $this->fail('Expected an exception.');
-        } catch (LengthException $e) {
+        } catch (LengthException) {
             // expected
         }
 

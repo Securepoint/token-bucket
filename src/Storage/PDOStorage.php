@@ -25,7 +25,7 @@ final class PDOStorage implements Storage, GlobalScope
     /**
      * @var PDO The pdo.
      */
-    private $pdo;
+    private readonly PDO $pdo;
 
     /**
      * @var string The shared name of the token bucket.
@@ -35,7 +35,7 @@ final class PDOStorage implements Storage, GlobalScope
     /**
      * @var TransactionalMutex The mutex.
      */
-    private $mutex;
+    private readonly TransactionalMutex $mutex;
 
     /**
      * Sets the PDO and the bucket's name for the shared storage.
@@ -80,7 +80,7 @@ final class PDOStorage implements Storage, GlobalScope
                          ) {$options};"
                     );
                 });
-            } catch (PDOException $e) {
+            } catch (PDOException) {
                 /*
                  * This exception is ignored to provide a portable way
                  * to create a table only if it doesn't exist yet.
@@ -100,10 +100,8 @@ final class PDOStorage implements Storage, GlobalScope
     public function isBootstrapped()
     {
         try {
-            return $this->onErrorRollback(function () {
-                return (bool) $this->querySingleValue('SELECT 1 FROM TokenBucket WHERE name=?', [$this->name]);
-            });
-        } catch (StorageException $e) {
+            return $this->onErrorRollback(fn() => (bool) $this->querySingleValue('SELECT 1 FROM TokenBucket WHERE name=?', [$this->name]));
+        } catch (StorageException) {
             // This seems to be a portable way to determine if the table exists or not.
             return false;
         } catch (PDOException $e) {
@@ -158,7 +156,7 @@ final class PDOStorage implements Storage, GlobalScope
     private function forVendor(array $map, $default = '')
     {
         $vendor = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-        return isset($map[$vendor]) ? $map[$vendor] : $default;
+        return $map[$vendor] ?? $default;
     }
 
     /**

@@ -42,24 +42,14 @@ use Securepoint\TokenBucket\Util\TokenConverter;
 final class TokenBucket
 {
     /**
-     * @var Rate The rate.
-     */
-    private $rate;
-
-    /**
      * @var int Token capacity of this bucket.
      */
     private $capacity;
 
     /**
-     * @var Storage The storage.
-     */
-    private $storage;
-
-    /**
      * @var TokenConverter Token converter.
      */
-    private $tokenConverter;
+    private readonly TokenConverter $tokenConverter;
 
     /**
      * Initializes the Token bucket.
@@ -70,15 +60,13 @@ final class TokenBucket
      * @param Rate    $rate      rate
      * @param Storage $storage   storage
      */
-    public function __construct($capacity, Rate $rate, Storage $storage)
+    public function __construct($capacity, private readonly Rate $rate, private readonly Storage $storage)
     {
         if ($capacity <= 0) {
             throw new InvalidArgumentException('Capacity should be greater than 0.');
         }
 
         $this->capacity = $capacity;
-        $this->rate = $rate;
-        $this->storage = $storage;
 
         $this->tokenConverter = new TokenConverter($rate);
     }
@@ -113,9 +101,7 @@ final class TokenBucket
             }
 
             $this->storage->getMutex()
-                ->check(function () {
-                    return ! $this->storage->isBootstrapped();
-                })
+                ->check(fn() => ! $this->storage->isBootstrapped())
                 ->then(function () use ($tokens) {
                     $this->storage->bootstrap($this->tokenConverter->convertTokensToMicrotime($tokens));
                 });
