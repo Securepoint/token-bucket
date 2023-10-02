@@ -35,7 +35,7 @@
     },
     "require-dev": {
         "predis/predis": "^2.2",
-        "phpunit/phpunit": "^10.3",
+        "phpunit/phpunit": "10.2.7",
         "mikey179/vfsstream": "^1.6",
         "php-mock/php-mock-phpunit": "^2.7",
         "phpstan/phpstan": "^1.10",
