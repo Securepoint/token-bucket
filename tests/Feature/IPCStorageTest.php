@@ -7,6 +7,7 @@ namespace Securepoint\TokenBucket\Tests\Feature;
 use PHPUnit\Framework\TestCase;
 use Securepoint\TokenBucket\Storage\IPCStorage;
 use Securepoint\TokenBucket\Storage\StorageException;
+use TypeError;
 
 /**
  * Tests for IPCStorage.
@@ -23,8 +24,8 @@ class IPCStorageTest extends TestCase
      */
     public function testBuildFailsForInvalidKey()
     {
-        $this->expectException(StorageException::class);
-        @new IPCStorage('invalid');
+        $this->expectException(TypeError::class);
+        new IPCStorage('invalid');
     }
 
     /**
@@ -32,11 +33,10 @@ class IPCStorageTest extends TestCase
      */
     public function testRemoveFails()
     {
-        $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('Could not release shared memory.');
+        $this->expectNotToPerformAssertions();
         $storage = new IPCStorage(ftok(__FILE__, 'a'));
         $storage->remove();
-        @$storage->remove();
+        $storage->remove();
     }
 
     /**
@@ -44,13 +44,12 @@ class IPCStorageTest extends TestCase
      */
     public function testfailRemovingSemaphore()
     {
-        $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('Could not remove semaphore.');
+        $this->expectNotToPerformAssertions();
         $key = ftok(__FILE__, 'a');
         $storage = new IPCStorage($key);
 
         sem_remove(sem_get($key));
-        @$storage->remove();
+        $storage->remove();
     }
 
     /**
