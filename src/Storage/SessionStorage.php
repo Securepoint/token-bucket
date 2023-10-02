@@ -17,7 +17,6 @@ use Securepoint\TokenBucket\Storage\Scope\SessionScope;
  * locking Mutex.
  *
  * @author Markus Malkusch <markus@malkusch.de>
- * @link bitcoin:1335STSwu9hST4vcMRppEPgENMHD2r1REK Donations
  * @license WTFPL
  */
 final class SessionStorage implements Storage, SessionScope

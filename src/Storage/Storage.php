@@ -20,7 +20,6 @@ use Securepoint\TokenBucket\Storage\Scope\SessionScope;
  * - {@link GlobalScope}: The bucket is shared among all processes.
  *
  * @author Markus Malkusch <markus@malkusch.de>
- * @link bitcoin:1335STSwu9hST4vcMRppEPgENMHD2r1REK Donations
  * @license WTFPL
  */
 interface Storage

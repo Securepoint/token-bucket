@@ -13,7 +13,6 @@ namespace Securepoint\TokenBucket\Storage\Scope;
  * for a resource within a session. E.g. limit an API usage per user.
  *
  * @author Markus Malkusch <markus@malkusch.de>
- * @link bitcoin:1335STSwu9hST4vcMRppEPgENMHD2r1REK Donations
  * @license WTFPL
  */
 interface SessionScope

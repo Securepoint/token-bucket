@@ -21,11 +21,11 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->rule(StaticDataProviderClassMethodRector::class);
     $rectorConfig->importNames();
 
-    $rectorConfig->cacheDirectory(__DIR__."/cache");
+   // $rectorConfig->cacheDirectory(__DIR__."/cache");
 
 
     // define sets of rules
-    //    $rectorConfig->sets([
-    //        LevelSetList::UP_TO_PHP_81
-    //    ]);
+        $rectorConfig->sets([
+            LevelSetList::UP_TO_PHP_81
+        ]);
 };

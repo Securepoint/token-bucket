@@ -17,7 +17,6 @@ use Securepoint\TokenBucket\Util\DoublePacker;
  * This storage is in the global scope.
  *
  * @author Markus Malkusch <markus@malkusch.de>
- * @link bitcoin:1335STSwu9hST4vcMRppEPgENMHD2r1REK Donations
  * @license WTFPL
  */
 final class PredisStorage implements Storage, GlobalScope

@@ -9,12 +9,14 @@ the resource consumption. I.e. you can limit a rate for consuming or producing.
 E.g. you can limit the consumption rate of a third party API service, or you
 can limit the usage rate of your own API service.
 
+**This is a fork from the original repository [bandwidth-throttle/token-bucket](https://github.com/bandwidth-throttle/token-bucket)**.
+
 # Installation
 
 Use [Composer](https://getcomposer.org/):
 
 ```sh
-composer require bandwidth-throttle/token-bucket
+composer require securepoint/token-bucket
 ```
 
 # Usage
@@ -141,14 +143,6 @@ This will effectively limit the rate to 10 requests per seconds as well. But
 in this case the client has not to bother with the 429 error. Instead the
 connection is just delayed to the desired rate.
 
-# License and authors
+# License
 
 This project is free and under the WTFPL.
-Responsible for this project is Markus Malkusch markus@malkusch.de.
-
-## Donations
-
-If you like this project and feel generous donate a few Bitcoins here:
-[1335STSwu9hST4vcMRppEPgENMHD2r1REK](bitcoin:1335STSwu9hST4vcMRppEPgENMHD2r1REK)
-
-[![Build Status](https://travis-ci.org/bandwidth-throttle/token-bucket.svg?branch=master)](https://travis-ci.org/bandwidth-throttle/token-bucket)

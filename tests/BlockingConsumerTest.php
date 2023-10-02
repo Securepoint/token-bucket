@@ -18,7 +18,6 @@ use Securepoint\TokenBucket\TokenBucket;
  * Test for BlockingConsumer.
  *
  * @author Markus Malkusch <markus@malkusch.de>
- * @link bitcoin:1335STSwu9hST4vcMRppEPgENMHD2r1REK Donations
  * @license WTFPL
  * @see BlockingConsumer
  */
