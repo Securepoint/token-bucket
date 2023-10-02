@@ -80,6 +80,7 @@ class PDOStorageTest extends TestCase
      */
     public function testLongName()
     {
+        $this->expectNotToPerformAssertions();
         $pdo = new PDO('sqlite::memory:');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         new PDOStorage(str_repeat(' ', 128), $pdo);
@@ -114,6 +115,7 @@ class PDOStorageTest extends TestCase
      */
     public function testValidErrorMode()
     {
+        $this->expectNotToPerformAssertions();
         $pdo = new PDO('sqlite::memory:');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         new PDOStorage('test', $pdo);

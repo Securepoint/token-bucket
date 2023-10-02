@@ -39,7 +39,7 @@ class FileStorageTest extends TestCase
     public function testSetMicrotimeFailsSeeking()
     {
         $this->expectException(StorageException::class);
-        $this->getFunctionMock(__NAMESPACE__, 'fseek')
+        $this->getFunctionMock('Securepoint\\TokenBucket\\Storage', 'fseek')
             ->expects($this->atLeastOnce())
             ->willReturn(-1);
 
@@ -54,7 +54,7 @@ class FileStorageTest extends TestCase
     public function testSetMicrotimeFailsWriting()
     {
         $this->expectException(StorageException::class);
-        $this->getFunctionMock(__NAMESPACE__, 'fwrite')
+        $this->getFunctionMock('Securepoint\\TokenBucket\\Storage', 'fwrite')
             ->expects($this->atLeastOnce())
             ->willReturn(false);
 
@@ -69,7 +69,7 @@ class FileStorageTest extends TestCase
     public function testGetMicrotimeFailsSeeking()
     {
         $this->expectException(StorageException::class);
-        $this->getFunctionMock(__NAMESPACE__, 'fseek')
+        $this->getFunctionMock('Securepoint\\TokenBucket\\Storage', 'fseek')
             ->expects($this->atLeastOnce())
             ->willReturn(-1);
 
@@ -84,7 +84,7 @@ class FileStorageTest extends TestCase
     public function testGetMicrotimeFailsReading()
     {
         $this->expectException(StorageException::class);
-        $this->getFunctionMock(__NAMESPACE__, 'fread')
+        $this->getFunctionMock('Securepoint\\TokenBucket\\Storage', 'fread')
             ->expects($this->atLeastOnce())
             ->willReturn(false);
 

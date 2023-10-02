@@ -35,6 +35,7 @@ class TokenBucketTest extends TestCase
     {
         $builder = new SleepEnvironmentBuilder();
         $builder->addNamespace(__NAMESPACE__)
+            ->addNamespace('Securepoint\\TokenBucket')
             ->addNamespace('Securepoint\\TokenBucket\\Util')
             ->setTimestamp(1417011228);
 

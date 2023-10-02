@@ -41,7 +41,7 @@ class TokenConverterTest extends TestCase
      *
      * @return array Test cases.
      */
-    public function provideTestConvertSecondsToTokens()
+    public static function provideTestConvertSecondsToTokens()
     {
         return [
             [0, 0.9, new Rate(1, Rate::SECOND)],
@@ -76,7 +76,7 @@ class TokenConverterTest extends TestCase
      *
      * @return array Test cases.
      */
-    public function provideTestconvertTokensToSeconds()
+    public static function provideTestconvertTokensToSeconds()
     {
         return [
             [0.001, 1, new Rate(1, Rate::MILLISECOND)],
