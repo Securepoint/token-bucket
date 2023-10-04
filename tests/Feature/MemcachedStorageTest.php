@@ -36,7 +36,6 @@ class MemcachedStorageTest extends TestCase
 
         if (! getenv('MEMCACHE_HOST')) {
             $this->markTestSkipped();
-            return;
         }
         $this->memcached = new Memcached();
         $this->memcached->addServer(getenv('MEMCACHE_HOST'), 11211);

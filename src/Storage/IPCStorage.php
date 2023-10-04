@@ -24,17 +24,17 @@ use SysvSharedMemory;
 final class IPCStorage implements Storage, GlobalScope
 {
     /**
-     * @var Mutex The mutex.
+     * @var SemaphoreMutex The mutex.
      */
     private ?SemaphoreMutex $mutex = null;
 
     /**
-     * @var resource The shared memory.
+     * @var SysvSharedMemory|null The shared memory.
      */
     private ?SysvSharedMemory $memory = null;
 
     /**
-     * @var resource The semaphore id.
+     * @var SysvSemaphore|null The semaphore id.
      */
     private ?SysvSemaphore $semaphore = null;
 

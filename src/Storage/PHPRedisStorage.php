@@ -24,7 +24,7 @@ use Securepoint\TokenBucket\Util\DoublePacker;
 final class PHPRedisStorage implements Storage, GlobalScope
 {
     /**
-     * @var Mutex The mutex.
+     * @var PHPRedisMutex The mutex.
      */
     private readonly PHPRedisMutex $mutex;
 
@@ -47,7 +47,7 @@ final class PHPRedisStorage implements Storage, GlobalScope
         $this->setMicrotime($microtime);
     }
 
-    public function isBootstrapped()
+    public function isBootstrapped(): bool|int
     {
         try {
             return $this->redis->exists($this->key);

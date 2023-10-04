@@ -101,7 +101,7 @@ final class PDOStorage implements Storage, GlobalScope
     {
         try {
             return $this->onErrorRollback(fn() => (bool) $this->querySingleValue('SELECT 1 FROM TokenBucket WHERE name=?', [$this->name]));
-        } catch (StorageException) {
+        } catch (StorageException $e) {
             // This seems to be a portable way to determine if the table exists or not.
             return false;
         } catch (PDOException $e) {

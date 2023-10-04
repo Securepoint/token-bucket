@@ -54,7 +54,7 @@ final class Rate
      *
      * E.g. new Rate(100, Rate::SECOND) will produce 100 tokens per second.
      *
-     * @param int    $tokens positive amount of tokens to produce per unit
+     * @param int|float    $tokens positive amount of tokens to produce per unit
      * @param string $unit   unit as one of Rate's constants
      */
     public function __construct($tokens, $unit)

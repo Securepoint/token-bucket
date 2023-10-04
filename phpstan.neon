@@ -18,9 +18,3 @@ parameters:
 
     # Start with level 5 and gradually up this. target should be level 8 at least
     level: 5
-
-    ignoreErrors:
-        # this error always occurrs when using PestPHP - ignore it
-        -
-            message: '#Undefined variable: \$this#'
-            path: tests/*

@@ -22,7 +22,7 @@ use Securepoint\TokenBucket\Storage\Scope\SessionScope;
 final class SessionStorage implements Storage, SessionScope
 {
     /**
-     * @var Mutex The mutex.
+     * @var NoMutex The mutex.
      */
     private readonly NoMutex $mutex;
 

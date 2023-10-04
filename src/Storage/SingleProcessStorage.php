@@ -20,12 +20,12 @@ use Securepoint\TokenBucket\Storage\Scope\RequestScope;
 final class SingleProcessStorage implements Storage, RequestScope
 {
     /**
-     * @var Mutex The mutex.
+     * @var NoMutex The mutex.
      */
     private readonly NoMutex $mutex;
 
     /**
-     * @var double The microtime.
+     * @var double|null The microtime.
      */
     private $microtime;
 

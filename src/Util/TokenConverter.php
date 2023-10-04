@@ -23,7 +23,7 @@ final class TokenConverter
     /**
      * Sets the token rate.
      *
-     * @param int $rate The rate.
+     * @param Rate $rate The rate.
      */
     public function __construct(private readonly Rate $rate)
     {
@@ -32,7 +32,7 @@ final class TokenConverter
     /**
      * Converts a duration of seconds into an amount of tokens.
      *
-     * @param double $seconds The duration in seconds.
+     * @param double|string $seconds The duration in seconds.
      * @return int The amount of tokens.
      */
     public function convertSecondsToTokens($seconds)

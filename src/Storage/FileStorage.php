@@ -21,7 +21,7 @@ use Securepoint\TokenBucket\Util\DoublePacker;
 final class FileStorage implements Storage, GlobalScope
 {
     /**
-     * @var Mutex The mutex.
+     * @var FlockMutex The mutex.
      */
     private FlockMutex $mutex;
 

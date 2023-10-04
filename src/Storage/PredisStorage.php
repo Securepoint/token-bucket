@@ -22,7 +22,7 @@ use Securepoint\TokenBucket\Util\DoublePacker;
 final class PredisStorage implements Storage, GlobalScope
 {
     /**
-     * @var Mutex The mutex.
+     * @var PredisMutex The mutex.
      */
     private readonly PredisMutex $mutex;
 
