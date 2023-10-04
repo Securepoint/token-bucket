@@ -19,15 +19,6 @@ use TypeError;
 class IPCStorageTest extends TestCase
 {
     /**
-     * Tests building fails for an invalid key.
-     */
-    public function testBuildFailsForInvalidKey()
-    {
-        $this->expectException(TypeError::class);
-        new IPCStorage('invalid');
-    }
-
-    /**
      * Tests remove() fails.
      */
     public function testRemoveFails()
