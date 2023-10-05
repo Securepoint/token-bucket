@@ -9,18 +9,20 @@ the resource consumption. I.e. you can limit a rate for consuming or producing.
 E.g. you can limit the consumption rate of a third party API service, or you
 can limit the usage rate of your own API service.
 
+**This is a fork from the original repository [bandwidth-throttle/token-bucket](https://github.com/bandwidth-throttle/token-bucket)**.
+
 # Installation
 
 Use [Composer](https://getcomposer.org/):
 
 ```sh
-composer require bandwidth-throttle/token-bucket
+composer require securepoint/token-bucket
 ```
 
 # Usage
 
 The package is in the namespace
-[`bandwidthThrottle\tokenBucket`](http://bandwidth-throttle.github.io/token-bucket/api/namespace-bandwidthThrottle.tokenBucket.html).
+[`Securepoint\TokenBucket`](http://bandwidth-throttle.github.io/token-bucket/api/namespace-bandwidthThrottle.tokenBucket.html).
 
 ## Example
 
@@ -28,9 +30,9 @@ This example will limit the rate of a global resource to 10 requests per second
 for all requests.
 
 ```php
-use bandwidthThrottle\tokenBucket\Rate;
-use bandwidthThrottle\tokenBucket\TokenBucket;
-use bandwidthThrottle\tokenBucket\storage\FileStorage;
+use Securepoint\TokenBucket\Rate;
+use Securepoint\TokenBucket\TokenBucket;
+use Securepoint\TokenBucket\Storage\FileStorage;
 
 $storage = new FileStorage(__DIR__ . "/api.bucket");
 $rate    = new Rate(10, Rate::SECOND);
@@ -120,10 +122,10 @@ serving the requests. You can do this by consuming the token bucket with
 a [`BlockingConsumer`](http://bandwidth-throttle.github.io/token-bucket/api/class-bandwidthThrottle.tokenBucket.BlockingConsumer.html).
 
 ```php
-use bandwidthThrottle\tokenBucket\Rate;
-use bandwidthThrottle\tokenBucket\TokenBucket;
-use bandwidthThrottle\tokenBucket\BlockingConsumer;
-use bandwidthThrottle\tokenBucket\storage\FileStorage;
+use Securepoint\TokenBucket\Rate;
+use Securepoint\TokenBucket\TokenBucket;
+use Securepoint\TokenBucket\BlockingConsumer;
+use Securepoint\TokenBucket\Storage\FileStorage;
 
 $storage  = new FileStorage(__DIR__ . "/api.bucket");
 $rate     = new Rate(10, Rate::SECOND);
@@ -141,14 +143,6 @@ This will effectively limit the rate to 10 requests per seconds as well. But
 in this case the client has not to bother with the 429 error. Instead the
 connection is just delayed to the desired rate.
 
-# License and authors
+# License
 
 This project is free and under the WTFPL.
-Responsible for this project is Markus Malkusch markus@malkusch.de.
-
-## Donations
-
-If you like this project and feel generous donate a few Bitcoins here:
-[1335STSwu9hST4vcMRppEPgENMHD2r1REK](bitcoin:1335STSwu9hST4vcMRppEPgENMHD2r1REK)
-
-[![Build Status](https://travis-ci.org/bandwidth-throttle/token-bucket.svg?branch=master)](https://travis-ci.org/bandwidth-throttle/token-bucket)
