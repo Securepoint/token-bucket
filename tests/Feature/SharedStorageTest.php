@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 use Predis\Client;
 use Redis;
 use Securepoint\TokenBucket\Storage\FileStorage;
-use Securepoint\TokenBucket\Storage\IPCStorage;
 use Securepoint\TokenBucket\Storage\MemcachedStorage;
 use Securepoint\TokenBucket\Storage\PDOStorage;
 use Securepoint\TokenBucket\Storage\PHPRedisStorage;
@@ -64,11 +63,6 @@ class SharedStorageTest extends TestCase
             [function ($name) {
                 vfsStream::setup('fileStorage');
                 return new FileStorage(vfsStream::url("fileStorage/{$name}"));
-            }],
-
-            [function ($name) {
-                $key = ftok(__FILE__, $name);
-                return new IPCStorage($key);
             }],
 
             [function ($name) {

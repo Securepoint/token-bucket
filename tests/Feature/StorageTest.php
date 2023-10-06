@@ -13,7 +13,6 @@ use Predis\Client;
 use Redis;
 use Securepoint\TokenBucket\Rate;
 use Securepoint\TokenBucket\Storage\FileStorage;
-use Securepoint\TokenBucket\Storage\IPCStorage;
 use Securepoint\TokenBucket\Storage\MemcachedStorage;
 use Securepoint\TokenBucket\Storage\PDOStorage;
 use Securepoint\TokenBucket\Storage\PHPRedisStorage;
@@ -74,9 +73,6 @@ class StorageTest extends TestCase
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return new PDOStorage('test', $pdo);
             }],
-            'IPCStorage' => [
-                fn () => new IPCStorage(ftok(__FILE__, 'a')),
-            ],
         ];
 
         if (getenv('MYSQL_DSN')) {
