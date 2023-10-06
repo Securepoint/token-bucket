@@ -13,7 +13,6 @@ namespace Securepoint\TokenBucket\Storage\Scope;
  * for a global resource. E.g. limit the aggregated bandwidth of a stream for
  * all processes.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 interface GlobalScope

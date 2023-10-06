@@ -16,7 +16,6 @@ use Securepoint\TokenBucket\Util\DoublePacker;
  *
  * This storage is in the global scope.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class PredisStorage implements Storage, GlobalScope
@@ -32,8 +31,10 @@ final class PredisStorage implements Storage, GlobalScope
      * @param string $key The resource name.
      * @param Client $redis The Redis API.
      */
-    public function __construct(private $key, private readonly Client $redis)
-    {
+    public function __construct(
+        private $key,
+        private readonly Client $redis
+    ) {
         $this->mutex = new PredisMutex([$redis], $key);
     }
 

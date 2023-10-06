@@ -9,7 +9,6 @@ use Exception;
 /**
  * The package's base exception.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 class TokenBucketException extends Exception

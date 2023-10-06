@@ -17,7 +17,6 @@ use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
  *
  * This storage is in the global scope.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class PDOStorage implements Storage, GlobalScope
@@ -48,9 +47,6 @@ final class PDOStorage implements Storage, GlobalScope
      *
      * @param string $name The name of the token bucket.
      * @param PDO    $pdo  The PDO.
-     *
-     * @throws LengthException The id should not be longer than 128 characters.
-     * @throws InvalidArgumentException PDO must be configured to throw exceptions.
      */
     public function __construct($name, PDO $pdo)
     {
@@ -100,7 +96,9 @@ final class PDOStorage implements Storage, GlobalScope
     public function isBootstrapped()
     {
         try {
-            return $this->onErrorRollback(fn() => (bool) $this->querySingleValue('SELECT 1 FROM TokenBucket WHERE name=?', [$this->name]));
+            return $this->onErrorRollback(
+                fn () => (bool) $this->querySingleValue('SELECT 1 FROM TokenBucket WHERE name=?', [$this->name])
+            );
         } catch (StorageException $e) {
             // This seems to be a portable way to determine if the table exists or not.
             return false;
@@ -145,6 +143,15 @@ final class PDOStorage implements Storage, GlobalScope
         );
     }
 
+    public function getMutex()
+    {
+        return $this->mutex;
+    }
+
+    public function letMicrotimeUnchanged()
+    {
+    }
+
     /**
      * Returns a vendor specific dialect value.
      *
@@ -166,7 +173,6 @@ final class PDOStorage implements Storage, GlobalScope
      * @param array  $parameters The optional query parameters.
      *
      * @return string The value.
-     * @throws StorageException The query failed.
      */
     private function querySingleValue($sql, $parameters = [])
     {
@@ -188,8 +194,6 @@ final class PDOStorage implements Storage, GlobalScope
 
     /**
      * Rollback to an implicit savepoint.
-     *
-     * @throws PDOException
      */
     private function onErrorRollback(callable $code)
     {
@@ -206,14 +210,5 @@ final class PDOStorage implements Storage, GlobalScope
         }
         $this->pdo->exec('RELEASE SAVEPOINT onErrorRollback');
         return $result;
-    }
-
-    public function getMutex()
-    {
-        return $this->mutex;
-    }
-
-    public function letMicrotimeUnchanged()
-    {
     }
 }

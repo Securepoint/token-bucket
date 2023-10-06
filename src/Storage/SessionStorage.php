@@ -16,11 +16,15 @@ use Securepoint\TokenBucket\Storage\Scope\SessionScope;
  * As PHP's session are thread safe this implementation doesn't provide a
  * locking Mutex.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class SessionStorage implements Storage, SessionScope
 {
+    /**
+     * @internal
+     */
+    public const SESSION_NAMESPACE = 'TokenBucket_';
+
     /**
      * @var NoMutex The mutex.
      */
@@ -30,11 +34,6 @@ final class SessionStorage implements Storage, SessionScope
      * @var string The session key for this bucket.
      */
     private readonly string $key;
-
-    /**
-     * @internal
-     */
-    public const SESSION_NAMESPACE = 'TokenBucket_';
 
     /**
      * Sets the bucket's name.

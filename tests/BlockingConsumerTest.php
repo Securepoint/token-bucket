@@ -17,7 +17,6 @@ use Securepoint\TokenBucket\TokenBucket;
 /**
  * Test for BlockingConsumer.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see BlockingConsumer
  */

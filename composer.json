@@ -60,7 +60,7 @@
     "scripts": {
         "cs": "@php vendor/bin/ecs check ",
         "fs": "@php vendor/bin/ecs check --fix ",
-        "testp": "@php ./vendor/bin/pest --parallel --processes=12",
+        "test": "@php ./vendor/bin/phpunit",
         "rector": [
             "Composer\\Config::disableProcessTimeout",
             "@php -dmemory_limit=1G ./vendor/bin/rector --autoload-file=vendor/autoload.php"

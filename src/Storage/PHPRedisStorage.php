@@ -18,7 +18,6 @@ use Securepoint\TokenBucket\Util\DoublePacker;
  *
  * This implementation requires at least phpredis-2.2.4.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class PHPRedisStorage implements Storage, GlobalScope
@@ -37,8 +36,10 @@ final class PHPRedisStorage implements Storage, GlobalScope
      * @param string $key The resource name.
      * @param Redis  $redis The Redis API.
      */
-    public function __construct(private $key, private readonly Redis $redis)
-    {
+    public function __construct(
+        private $key,
+        private readonly Redis $redis
+    ) {
         $this->mutex = new PHPRedisMutex([$redis], $key);
     }
 

@@ -9,19 +9,26 @@ use InvalidArgumentException;
 /**
  * The rate.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class Rate
 {
     public const MICROSECOND = 'microsecond';
+
     public const MILLISECOND = 'millisecond';
+
     public const SECOND = 'second';
+
     public const MINUTE = 'minute';
+
     public const HOUR = 'hour';
+
     public const DAY = 'day';
+
     public const WEEK = 'week';
+
     public const MONTH = 'month';
+
     public const YEAR = 'year';
 
     /**

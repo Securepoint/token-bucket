@@ -9,7 +9,6 @@ use Securepoint\TokenBucket\Storage\StorageException;
 /**
  * Double packer.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @internal
  */
@@ -33,7 +32,6 @@ final class DoublePacker
      *
      * @param string $string packed 8 byte string representation.
      * @return double unpacked 64 bit double
-     * @throws StorageException conversion error
      */
     public static function unpack($string)
     {

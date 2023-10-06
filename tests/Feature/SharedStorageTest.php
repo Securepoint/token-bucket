@@ -31,7 +31,6 @@ use Securepoint\TokenBucket\Storage\StorageException;
  * - MEMCACHE_HOST
  * - REDIS_URI
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see Storage
  */
@@ -58,7 +57,9 @@ class SharedStorageTest extends TestCase
     public static function provideStorageFactories()
     {
         $cases = [
-            [fn($name) => new SessionStorage($name)],
+            [
+                fn ($name) => new SessionStorage($name),
+            ],
 
             [function ($name) {
                 vfsStream::setup('fileStorage');

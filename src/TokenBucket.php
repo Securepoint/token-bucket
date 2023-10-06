@@ -36,7 +36,6 @@ use Securepoint\TokenBucket\Util\TokenConverter;
  * }
  * </code>
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class TokenBucket
@@ -60,8 +59,11 @@ final class TokenBucket
      * @param Rate    $rate      rate
      * @param Storage $storage   storage
      */
-    public function __construct($capacity, private readonly Rate $rate, private readonly Storage $storage)
-    {
+    public function __construct(
+        $capacity,
+        private readonly Rate $rate,
+        private readonly Storage $storage
+    ) {
         if ($capacity <= 0) {
             throw new InvalidArgumentException('Capacity should be greater than 0.');
         }
@@ -84,9 +86,6 @@ final class TokenBucket
      * This method is threadsafe.
      *
      * @param int $tokens Initial amount of tokens, default is 0.
-     *
-     * @throws StorageException Bootstrapping failed.
-     * @throws LengthException The initial amount of tokens is larger than the capacity.
      */
     public function bootstrap($tokens = 0)
     {
@@ -101,7 +100,7 @@ final class TokenBucket
             }
 
             $this->storage->getMutex()
-                ->check(fn() => ! $this->storage->isBootstrapped())
+                ->check(fn () => ! $this->storage->isBootstrapped())
                 ->then(function () use ($tokens) {
                     $this->storage->bootstrap($this->tokenConverter->convertTokensToMicrotime($tokens));
                 });
@@ -124,9 +123,6 @@ final class TokenBucket
      *
      * @return bool If tokens were consumed.
      * @SuppressWarnings(PHPMD)
-     *
-     * @throws LengthException The token amount is larger than the capacity.
-     * @throws StorageException The stored microtime could not be accessed.
      */
     public function consume($tokens, &$seconds = 0)
     {
@@ -194,7 +190,6 @@ final class TokenBucket
      * This method will never return more than the capacity of the bucket.
      *
      * @return int amount of currently available tokens
-     * @throws StorageException The stored microtime could not be accessed.
      */
     public function getTokens()
     {
@@ -208,7 +203,6 @@ final class TokenBucket
      * {@link TokenBucket::getTokens()} and {@link TokenBucket::consume()}
      * while accessing the storage only once.
      *
-     * @throws StorageException The stored microtime could not be accessed.
      * @return array tokens and microtime
      */
     private function loadTokensAndTimestamp()

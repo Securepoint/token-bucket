@@ -18,7 +18,6 @@ use SysvSharedMemory;
  * This storage is in the global scope. However the scope is limited to the
  * shared memory. I.e. the scope is not shared between hosts.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class IPCStorage implements Storage, GlobalScope
@@ -44,31 +43,11 @@ final class IPCStorage implements Storage, GlobalScope
      * You can create the key with PHP's function ftok().
      *
      * @param int $key The System V IPC key.
-     *
-     * @throws StorageException Could initialize IPC infrastructure.
      */
-    public function __construct(private readonly int $key)
-    {
+    public function __construct(
+        private readonly int $key
+    ) {
         $this->attach();
-    }
-
-    /**
-     * Attaches the shared memory segment.
-     *
-     * @throws StorageException Could not initialize IPC infrastructure.
-     */
-    private function attach()
-    {
-        try {
-            $this->semaphore = sem_get($this->key);
-            $this->mutex = new SemaphoreMutex($this->semaphore);
-        } catch (InvalidArgumentException $e) {
-            throw new StorageException('Could not get semaphore id.', 0, $e);
-        }
-
-        if (! $this->memory = shm_attach($this->key, 128)) {
-            throw new StorageException('Failed to attach to shared memory.');
-        }
     }
 
     public function bootstrap($microtime)
@@ -128,5 +107,22 @@ final class IPCStorage implements Storage, GlobalScope
 
     public function letMicrotimeUnchanged()
     {
+    }
+
+    /**
+     * Attaches the shared memory segment.
+     */
+    private function attach()
+    {
+        try {
+            $this->semaphore = sem_get($this->key);
+            $this->mutex = new SemaphoreMutex($this->semaphore);
+        } catch (InvalidArgumentException $e) {
+            throw new StorageException('Could not get semaphore id.', 0, $e);
+        }
+
+        if (! $this->memory = shm_attach($this->key, 128)) {
+            throw new StorageException('Failed to attach to shared memory.');
+        }
     }
 }

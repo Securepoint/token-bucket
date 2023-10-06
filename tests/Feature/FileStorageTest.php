@@ -14,7 +14,6 @@ use Securepoint\TokenBucket\Storage\StorageException;
 /**
  * Tests for FileStorage.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see FileStorage
  */

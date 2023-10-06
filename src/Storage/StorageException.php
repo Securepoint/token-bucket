@@ -9,7 +9,6 @@ use Securepoint\TokenBucket\TokenBucketException;
 /**
  * The storage exception.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class StorageException extends TokenBucketException

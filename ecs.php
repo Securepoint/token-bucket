@@ -27,8 +27,5 @@ return static function (ECSConfig $ecsConfig): void {
 
     $ecsConfig->skip([
         AssignmentInConditionSniff::class,
-        ClassAttributesSeparationFixer::class,
-        OrderedClassElementsFixer::class,
-        GeneralPhpdocAnnotationRemoveFixer::class,
     ]);
 };
