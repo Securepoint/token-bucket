@@ -12,7 +12,6 @@ use Securepoint\TokenBucket\Rate;
 /**
  * Test for Rate.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see Rate
  */

@@ -7,12 +7,10 @@ namespace Securepoint\TokenBucket\Tests\Feature;
 use PHPUnit\Framework\TestCase;
 use Securepoint\TokenBucket\Storage\IPCStorage;
 use Securepoint\TokenBucket\Storage\StorageException;
-use TypeError;
 
 /**
  * Tests for IPCStorage.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see IPCStorage
  */

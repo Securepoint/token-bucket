@@ -16,7 +16,6 @@ use Securepoint\TokenBucket\Storage\StorageException;
  *
  * These tests need the environment variable REDIS_URI.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see PredisStorage
  */

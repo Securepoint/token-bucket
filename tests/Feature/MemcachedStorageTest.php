@@ -14,7 +14,6 @@ use Securepoint\TokenBucket\Storage\StorageException;
  *
  * These tests need the environment variable MEMCACHE_HOST.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see MemcachedStorage
  */
@@ -128,7 +127,6 @@ class MemcachedStorageTest extends TestCase
 
         $this->storage->setMicrotime(123);
     }
-
 
     /**
      * Tests getMicrotime() fails.

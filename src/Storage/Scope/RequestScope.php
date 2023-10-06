@@ -13,7 +13,6 @@ namespace Securepoint\TokenBucket\Storage\Scope;
  * for a resource which is used within one request. E.g. bandwidth throtteling
  * for downloading a stream.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 interface RequestScope

@@ -13,7 +13,6 @@ use Securepoint\TokenBucket\Util\TokenConverter;
 /**
  * Tests for TokenConverter.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see  TokenConverter
  */

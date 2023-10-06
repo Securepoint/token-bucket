@@ -12,7 +12,6 @@ namespace Securepoint\TokenBucket\Storage\Scope;
  * A Token bucket which uses a storage of the session scope can limit a rate
  * for a resource within a session. E.g. limit an API usage per user.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 interface SessionScope

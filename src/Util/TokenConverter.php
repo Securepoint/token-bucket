@@ -9,7 +9,6 @@ use Securepoint\TokenBucket\Rate;
 /**
  * Tokens converter.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @internal
  */
@@ -25,8 +24,9 @@ final class TokenConverter
      *
      * @param Rate $rate The rate.
      */
-    public function __construct(private readonly Rate $rate)
-    {
+    public function __construct(
+        private readonly Rate $rate
+    ) {
     }
 
     /**

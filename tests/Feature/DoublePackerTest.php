@@ -12,7 +12,6 @@ use Securepoint\TokenBucket\Util\DoublePacker;
 /**
  * Tests for DoublePacker.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see  DoublePacker
  */

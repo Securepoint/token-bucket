@@ -19,7 +19,6 @@ use Securepoint\TokenBucket\TokenBucket;
 /**
  * Test for TokenBucket.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see TokenBucket
  */

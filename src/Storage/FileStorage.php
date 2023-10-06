@@ -15,7 +15,6 @@ use Securepoint\TokenBucket\Util\DoublePacker;
  * This storage is in the global scope. However the scope is limited to the
  * underlying filesystem. I.e. the scope is not shared between hosts.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class FileStorage implements Storage, GlobalScope
@@ -37,25 +36,11 @@ final class FileStorage implements Storage, GlobalScope
      * operation.
      *
      * @param string $path The file path.
-     * @throws StorageException Failed to open the file.
      */
-    public function __construct(private $path)
-    {
+    public function __construct(
+        private $path
+    ) {
         $this->open();
-    }
-
-    /**
-     * Opens the file and initializes the mutex.
-     *
-     * @throws StorageException Failed to open the file.
-     */
-    private function open()
-    {
-        $this->fileHandle = fopen($this->path, 'c+');
-        if (! is_resource($this->fileHandle)) {
-            throw new StorageException("Could not open '{$this->path}'.");
-        }
-        $this->mutex = new FlockMutex($this->fileHandle);
     }
 
     /**
@@ -130,5 +115,17 @@ final class FileStorage implements Storage, GlobalScope
 
     public function letMicrotimeUnchanged()
     {
+    }
+
+    /**
+     * Opens the file and initializes the mutex.
+     */
+    private function open()
+    {
+        $this->fileHandle = fopen($this->path, 'c+');
+        if (! is_resource($this->fileHandle)) {
+            throw new StorageException("Could not open '{$this->path}'.");
+        }
+        $this->mutex = new FlockMutex($this->fileHandle);
     }
 }

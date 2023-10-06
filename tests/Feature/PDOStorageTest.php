@@ -22,7 +22,6 @@ use Securepoint\TokenBucket\Storage\StorageException;
  * - MYSQL_DSN, MYSQL_USER
  * - PGSQL_DSN, PGSQL_USER
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  * @see PDOStorage
  */

@@ -14,7 +14,6 @@ use Securepoint\TokenBucket\Storage\Scope\RequestScope;
  * This storage is in the request scope. It is not shared among processes and
  * therefore needs no locking.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 final class SingleProcessStorage implements Storage, RequestScope

@@ -19,7 +19,6 @@ use Securepoint\TokenBucket\Storage\Scope\SessionScope;
  * - {@link SessionScope}: The bucket is shared between requests of one session.
  * - {@link GlobalScope}: The bucket is shared among all processes.
  *
- * @author Markus Malkusch <markus@malkusch.de>
  * @license WTFPL
  */
 interface Storage
@@ -36,7 +35,6 @@ interface Storage
      * Returns if the Storage was already bootstrapped.
      *
      * @return bool True if the Storage was already bootstrapped.
-     * @throws StorageException Checking the state of the Storage failed.
      * @internal
      */
     public function isBootstrapped();
@@ -45,7 +43,6 @@ interface Storage
      * Bootstraps the Storage.
      *
      * @param double $microtime The timestamp.
-     * @throws StorageException Bootstrapping failed.
      * @internal
      */
     public function bootstrap($microtime);
@@ -58,7 +55,6 @@ interface Storage
      * and bootstrap(). A call to bootstrap() results in a defined object
      * again.
      *
-     * @throws StorageException Cleaning failed.
      * @internal
      */
     public function remove();
@@ -67,7 +63,6 @@ interface Storage
      * Stores a timestamp.
      *
      * @param double $microtime The timestamp.
-     * @throws StorageException Writing to the Storage failed.
      * @internal
      */
     public function setMicrotime($microtime);
@@ -83,7 +78,6 @@ interface Storage
      * Returns the stored timestamp.
      *
      * @return double The timestamp.
-     * @throws StorageException Reading from the Storage failed.
      * @internal
      */
     public function getMicrotime();
