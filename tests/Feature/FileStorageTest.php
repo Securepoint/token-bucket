@@ -24,7 +24,7 @@ class FileStorageTest extends TestCase
     /**
      * Tests opening the file fails.
      */
-    public function testOpeningFails()
+    public function testOpeningFails(): void
     {
         $this->expectException(StorageException::class);
         vfsStream::setup('test');
@@ -34,7 +34,7 @@ class FileStorageTest extends TestCase
     /**
      * Tests seeking fails in setMicrotime().
      */
-    public function testSetMicrotimeFailsSeeking()
+    public function testSetMicrotimeFailsSeeking(): void
     {
         $this->expectException(StorageException::class);
         $this->getFunctionMock('Securepoint\\TokenBucket\\Storage', 'fseek')
@@ -49,7 +49,7 @@ class FileStorageTest extends TestCase
     /**
      * Tests writings fails in setMicrotime().
      */
-    public function testSetMicrotimeFailsWriting()
+    public function testSetMicrotimeFailsWriting(): void
     {
         $this->expectException(StorageException::class);
         $this->getFunctionMock('Securepoint\\TokenBucket\\Storage', 'fwrite')
@@ -64,7 +64,7 @@ class FileStorageTest extends TestCase
     /**
      * Tests seeking fails in getMicrotime().
      */
-    public function testGetMicrotimeFailsSeeking()
+    public function testGetMicrotimeFailsSeeking(): void
     {
         $this->expectException(StorageException::class);
         $this->getFunctionMock('Securepoint\\TokenBucket\\Storage', 'fseek')
@@ -79,7 +79,7 @@ class FileStorageTest extends TestCase
     /**
      * Tests reading fails in getMicrotime().
      */
-    public function testGetMicrotimeFailsReading()
+    public function testGetMicrotimeFailsReading(): void
     {
         $this->expectException(StorageException::class);
         $this->getFunctionMock('Securepoint\\TokenBucket\\Storage', 'fread')
@@ -94,7 +94,7 @@ class FileStorageTest extends TestCase
     /**
      * Tests readinging too little in getMicrotime().
      */
-    public function testGetMicrotimeReadsToLittle()
+    public function testGetMicrotimeReadsToLittle(): void
     {
         $this->expectException(StorageException::class);
         $data = new vfsStreamFile('data');
@@ -108,7 +108,7 @@ class FileStorageTest extends TestCase
     /**
      * Tests deleting fails.
      */
-    public function testRemoveFails()
+    public function testRemoveFails(): void
     {
         $this->expectException(StorageException::class);
         $data = new vfsStreamFile('data');

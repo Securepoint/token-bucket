@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Securepoint\TokenBucket;
 
+use Exception;
 use InvalidArgumentException;
 use LengthException;
 use malkusch\lock\exception\MutexException;
@@ -43,7 +44,7 @@ final class TokenBucket
     /**
      * @var int Token capacity of this bucket.
      */
-    private $capacity;
+    private readonly int $capacity;
 
     /**
      * @var TokenConverter Token converter.
@@ -60,7 +61,7 @@ final class TokenBucket
      * @param Storage $storage   storage
      */
     public function __construct(
-        $capacity,
+        int $capacity,
         private readonly Rate $rate,
         private readonly Storage $storage
     ) {
@@ -86,8 +87,9 @@ final class TokenBucket
      * This method is threadsafe.
      *
      * @param int $tokens Initial amount of tokens, default is 0.
+     * @throws StorageException
      */
-    public function bootstrap($tokens = 0)
+    public function bootstrap(int $tokens = 0): void
     {
         try {
             if ($tokens > $this->capacity) {
@@ -118,13 +120,13 @@ final class TokenBucket
      *
      * This method is threadsafe.
      *
-     * @param int    $tokens   The token amount.
-     * @param double $seconds The seconds to wait.
+     * @param int $tokens The token amount.
+     * @param float|null $seconds The seconds to wait.
      *
      * @return bool If tokens were consumed.
-     * @SuppressWarnings(PHPMD)
+     * @throws StorageException
      */
-    public function consume($tokens, &$seconds = 0)
+    public function consume(int $tokens, ?float &$seconds = 0): bool
     {
         try {
             if ($tokens > $this->capacity) {
@@ -134,9 +136,10 @@ final class TokenBucket
                 throw new InvalidArgumentException("Token amount ({$tokens}) should be greater than 0.");
             }
 
-            return $this->storage->getMutex()
+            /** @var bool $result */
+            $result = $this->storage->getMutex()
                 ->synchronized(
-                    function () use ($tokens, &$seconds) {
+                    function () use ($tokens, &$seconds): bool {
                         $tokensAndMicrotime = $this->loadTokensAndTimestamp();
                         $microtime = $tokensAndMicrotime['microtime'];
                         $availableTokens = $tokensAndMicrotime['tokens'];
@@ -154,7 +157,11 @@ final class TokenBucket
                         return true;
                     }
                 );
-        } catch (MutexException $e) {
+            return $result;
+        } catch (MutexException|Exception $e) {
+            if ($e instanceof LengthException || $e instanceof InvalidArgumentException) {
+                throw $e;
+            }
             throw new StorageException('Could not lock token consumption.', 0, $e);
         }
     }
@@ -164,7 +171,7 @@ final class TokenBucket
      *
      * @return Rate The rate.
      */
-    public function getRate()
+    public function getRate(): Rate
     {
         return $this->rate;
     }
@@ -174,7 +181,7 @@ final class TokenBucket
      *
      * @return int The capacity.
      */
-    public function getCapacity()
+    public function getCapacity(): int
     {
         return $this->capacity;
     }
@@ -191,7 +198,7 @@ final class TokenBucket
      *
      * @return int amount of currently available tokens
      */
-    public function getTokens()
+    public function getTokens(): int
     {
         return $this->loadTokensAndTimestamp()['tokens'];
     }
@@ -203,9 +210,9 @@ final class TokenBucket
      * {@link TokenBucket::getTokens()} and {@link TokenBucket::consume()}
      * while accessing the storage only once.
      *
-     * @return array tokens and microtime
+     * @return array{'tokens': int, 'microtime': float} tokens and microtime
      */
-    private function loadTokensAndTimestamp()
+    private function loadTokensAndTimestamp(): array
     {
         $microtime = $this->storage->getMicrotime();
 

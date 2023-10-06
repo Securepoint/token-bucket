@@ -49,12 +49,12 @@ final class Rate
     /**
      * @var int The amount of tokens to produce for the unit.
      */
-    private $tokens;
+    private readonly int|float $tokens;
 
     /**
      * @var string The unit.
      */
-    private $unit;
+    private readonly string $unit;
 
     /**
      * Sets the amount of tokens which will be produced per unit.
@@ -64,7 +64,7 @@ final class Rate
      * @param int|float    $tokens positive amount of tokens to produce per unit
      * @param string $unit   unit as one of Rate's constants
      */
-    public function __construct($tokens, $unit)
+    public function __construct(int|float $tokens, string $unit)
     {
         if (! isset(self::$unitMap[$unit])) {
             throw new InvalidArgumentException('Not a valid unit.');
@@ -82,7 +82,7 @@ final class Rate
      * @return double The rate.
      * @internal
      */
-    public function getTokensPerSecond()
+    public function getTokensPerSecond(): float
     {
         return $this->tokens / self::$unitMap[$this->unit];
     }

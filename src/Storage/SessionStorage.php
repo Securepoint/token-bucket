@@ -23,7 +23,7 @@ final class SessionStorage implements Storage, SessionScope
     /**
      * @internal
      */
-    public const SESSION_NAMESPACE = 'TokenBucket_';
+    public const SESSION_NAMESPACE = 'token_bucket_';
 
     /**
      * @var NoMutex The mutex.
@@ -40,18 +40,18 @@ final class SessionStorage implements Storage, SessionScope
      *
      * @param string $name The bucket's name.
      */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->mutex = new NoMutex();
         $this->key = self::SESSION_NAMESPACE . $name;
     }
 
-    public function getMutex()
+    public function getMutex(): Mutex
     {
         return $this->mutex;
     }
 
-    public function bootstrap($microtime)
+    public function bootstrap(float $microtime): void
     {
         $this->setMicrotime($microtime);
     }
@@ -60,16 +60,16 @@ final class SessionStorage implements Storage, SessionScope
      * @SuppressWarnings(PHPMD)
      * @internal
      */
-    public function getMicrotime()
+    public function getMicrotime(): float
     {
-        return $_SESSION[$this->key];
+        return is_float($_SESSION[$this->key]) ? $_SESSION[$this->key] : 0.0;
     }
 
     /**
      * @SuppressWarnings(PHPMD)
      * @internal
      */
-    public function isBootstrapped()
+    public function isBootstrapped(): bool
     {
         return isset($_SESSION[$this->key]);
     }
@@ -78,7 +78,7 @@ final class SessionStorage implements Storage, SessionScope
      * @SuppressWarnings(PHPMD)
      * @internal
      */
-    public function remove()
+    public function remove(): void
     {
         unset($_SESSION[$this->key]);
     }
@@ -87,12 +87,12 @@ final class SessionStorage implements Storage, SessionScope
      * @SuppressWarnings(PHPMD)
      * @internal
      */
-    public function setMicrotime($microtime)
+    public function setMicrotime(float $microtime): void
     {
         $_SESSION[$this->key] = $microtime;
     }
 
-    public function letMicrotimeUnchanged()
+    public function letMicrotimeUnchanged(): void
     {
     }
 }

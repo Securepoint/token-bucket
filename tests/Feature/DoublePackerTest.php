@@ -21,10 +21,10 @@ class DoublePackerTest extends TestCase
      * Tests pack().
      *
      * @param string $expected The expected string.
-     * @param double $input The input double.
+     * @param int|float $input The input double.
      */
     #[DataProvider('provideTestPack')]
-    public function testPack($expected, $input)
+    public function testPack(string $expected, int|float $input): void
     {
         $this->assertEquals($expected, DoublePacker::pack($input));
     }
@@ -32,9 +32,9 @@ class DoublePackerTest extends TestCase
     /**
      * Provides test cases for testPack().
      *
-     * @return array Test cases.
+     * @return array<int,array<int,string|int|float>> Test cases.
      */
-    public static function provideTestPack()
+    public static function provideTestPack(): array
     {
         return [[pack('d', 0), 0], [pack('d', 0.1), 0.1], [pack('d', 1), 1]];
     }
@@ -45,7 +45,7 @@ class DoublePackerTest extends TestCase
      * @param string $input The input string.
      */
     #[DataProvider('provideTestUnpackFails')]
-    public function testUnpackFails($input)
+    public function testUnpackFails(string $input): void
     {
         $this->expectException(StorageException::class);
         DoublePacker::unpack($input);
@@ -54,9 +54,9 @@ class DoublePackerTest extends TestCase
     /**
      * Provides test cases for testUnpackFails().
      *
-     * @return array Test cases.
+     * @return array<int,array<int,string>> Test cases.
      */
-    public static function provideTestUnpackFails()
+    public static function provideTestUnpackFails(): array
     {
         return [[''], ['1234567'], ['123456789']];
     }
@@ -64,11 +64,12 @@ class DoublePackerTest extends TestCase
     /**
      * Tests unpack().
      *
-     * @param double $expected The expected double.
+     * @param float $expected The expected double.
      * @param string $input The input string.
+     * @throws StorageException
      */
     #[DataProvider('provideTestUnpack')]
-    public function testUnpack($expected, $input)
+    public function testUnpack(float $expected, string $input): void
     {
         $this->assertEquals($expected, DoublePacker::unpack($input));
     }
@@ -76,9 +77,9 @@ class DoublePackerTest extends TestCase
     /**
      * Provides test cases for testConvert().
      *
-     * @return array Test cases.
+     * @return array<int,array<int,string|int|float>> Test cases.
      */
-    public static function provideTestUnpack()
+    public static function provideTestUnpack(): array
     {
         return [[0, pack('d', 0)], [0.1, pack('d', 0.1)], [1, pack('d', 1)], [1.1, pack('d', 1.1)]];
     }

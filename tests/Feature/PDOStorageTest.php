@@ -44,7 +44,7 @@ class PDOStorageTest extends TestCase
      *
      * @return PDO[][] The PDOs.
      */
-    public static function providePDO()
+    public static function providePDO(): array
     {
         $cases = [[new PDO('sqlite::memory:')]];
         if (getenv('MYSQL_DSN')) {
@@ -65,7 +65,7 @@ class PDOStorageTest extends TestCase
     /**
      * Tests instantiation with a too long name should fail.
      */
-    public function testTooLongNameFails()
+    public function testTooLongNameFails(): void
     {
         $this->expectException(LengthException::class);
         $pdo = new PDO('sqlite::memory:');
@@ -76,7 +76,7 @@ class PDOStorageTest extends TestCase
     /**
      * Tests instantiation with a long name should not fail.
      */
-    public function testLongName()
+    public function testLongName(): void
     {
         $this->expectNotToPerformAssertions();
         $pdo = new PDO('sqlite::memory:');
@@ -90,7 +90,7 @@ class PDOStorageTest extends TestCase
      * @param int $errorMode The invalid error mode.
      */
     #[DataProvider('provideTestInvalidErrorMode')]
-    public function testInvalidErrorMode($errorMode)
+    public function testInvalidErrorMode(int $errorMode): void
     {
         $this->expectException(InvalidArgumentException::class);
         $pdo = new PDO('sqlite::memory:');
@@ -103,7 +103,7 @@ class PDOStorageTest extends TestCase
      *
      * @return int[][] Invalid error modes.
      */
-    public static function provideTestInvalidErrorMode()
+    public static function provideTestInvalidErrorMode(): array
     {
         return [[PDO::ERRMODE_SILENT], [PDO::ERRMODE_WARNING]];
     }
@@ -111,7 +111,7 @@ class PDOStorageTest extends TestCase
     /**
      * Tests instantiation with PDO in valid error mode.
      */
-    public function testValidErrorMode()
+    public function testValidErrorMode(): void
     {
         $this->expectNotToPerformAssertions();
         $pdo = new PDO('sqlite::memory:');
@@ -125,7 +125,7 @@ class PDOStorageTest extends TestCase
      * @param PDO $pdo The PDO.
      */
     #[DataProvider('providePDO')]
-    public function testBootstrapAddsRow(PDO $pdo)
+    public function testBootstrapAddsRow(PDO $pdo): void
     {
         $storageA = new PDOStorage('A', $pdo);
         $storageA->bootstrap(1);
@@ -145,7 +145,7 @@ class PDOStorageTest extends TestCase
      * @param PDO $pdo The PDO.
      */
     #[DataProvider('providePDO')]
-    public function testBootstrapFailsForExistingRow(PDO $pdo)
+    public function testBootstrapFailsForExistingRow(PDO $pdo): void
     {
         $this->expectException(StorageException::class);
         $storageA = new PDOStorage('A', $pdo);
@@ -162,7 +162,7 @@ class PDOStorageTest extends TestCase
      * @param PDO $pdo The PDO.
      */
     #[DataProvider('providePDO')]
-    public function testRemoveOneRow(PDO $pdo)
+    public function testRemoveOneRow(PDO $pdo): void
     {
         $storageA = new PDOStorage('A', $pdo);
         $storageA->bootstrap(0);
@@ -182,7 +182,7 @@ class PDOStorageTest extends TestCase
      * @param PDO $pdo The PDO.
      */
     #[DataProvider('providePDO')]
-    public function testRemoveTable(PDO $pdo)
+    public function testRemoveTable(PDO $pdo): void
     {
         $storage = new PDOStorage('test', $pdo);
         $storage->bootstrap(0);

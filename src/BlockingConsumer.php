@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Securepoint\TokenBucket;
 
 use InvalidArgumentException;
+use Securepoint\TokenBucket\Storage\StorageException;
 
 /**
  * Blocking token bucket consumer.
@@ -16,7 +17,7 @@ final class BlockingConsumer
     /**
      * @var int|null optional timeout in seconds.
      */
-    private $timeout;
+    private readonly ?int $timeout;
 
     /**
      * Set the token bucket and an optional timeout.
@@ -26,7 +27,7 @@ final class BlockingConsumer
      */
     public function __construct(
         private readonly TokenBucket $bucket,
-        $timeout = null
+        ?int $timeout = null
     ) {
         if ($timeout < 0) {
             throw new InvalidArgumentException('Timeout must be null or positive');
@@ -41,8 +42,10 @@ final class BlockingConsumer
      * consumer blocks until it can consume the tokens.
      *
      * @param int $tokens The token amount.
+     * @throws TimeoutException
+     * @throws StorageException
      */
-    public function consume($tokens)
+    public function consume(int $tokens): void
     {
         $timedOut = $this->timeout === null ? null : (microtime(true) + $this->timeout);
         while (! $this->bucket->consume($tokens, $seconds)) {
@@ -59,7 +62,7 @@ final class BlockingConsumer
             }
 
             // sleep at least 1 millisecond.
-            usleep(max(1000, $seconds * 1000000));
+            usleep(max(1000, (int)$seconds * 1000000));
         }
     }
 
@@ -67,8 +70,9 @@ final class BlockingConsumer
      * Checks if the timeout was exceeded.
      *
      * @param float|null $timedOut Timestamp when to time out.
+     * @throws TimeoutException
      */
-    private static function throwTimeoutIfExceeded($timedOut)
+    private static function throwTimeoutIfExceeded(?float $timedOut): void
     {
         if ($timedOut === null) {
             return;
@@ -86,7 +90,7 @@ final class BlockingConsumer
      *
      * @return float Seconds for waiting
      */
-    private static function keepSecondsWithinTimeout($seconds, $timedOut)
+    private static function keepSecondsWithinTimeout(float $seconds, ?float $timedOut): float
     {
         if ($timedOut === null) {
             return $seconds;

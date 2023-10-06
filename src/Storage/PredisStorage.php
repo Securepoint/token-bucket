@@ -8,6 +8,7 @@ use malkusch\lock\mutex\Mutex;
 use malkusch\lock\mutex\PredisMutex;
 use Predis\Client;
 use Predis\PredisException;
+use Predis\Response\ErrorInterface;
 use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
 use Securepoint\TokenBucket\Util\DoublePacker;
 
@@ -32,18 +33,18 @@ final class PredisStorage implements Storage, GlobalScope
      * @param Client $redis The Redis API.
      */
     public function __construct(
-        private $key,
+        private readonly string $key,
         private readonly Client $redis
     ) {
         $this->mutex = new PredisMutex([$redis], $key);
     }
 
-    public function bootstrap($microtime)
+    public function bootstrap(float $microtime): void
     {
         $this->setMicrotime($microtime);
     }
 
-    public function isBootstrapped()
+    public function isBootstrapped(): bool
     {
         try {
             return (bool) $this->redis->exists($this->key);
@@ -52,7 +53,7 @@ final class PredisStorage implements Storage, GlobalScope
         }
     }
 
-    public function remove()
+    public function remove(): void
     {
         try {
             if (! $this->redis->del($this->key)) {
@@ -64,13 +65,13 @@ final class PredisStorage implements Storage, GlobalScope
     }
 
     /**
-     * @SuppressWarnings(PHPMD)
+     * @throws StorageException
      */
-    public function setMicrotime($microtime)
+    public function setMicrotime(float $microtime): void
     {
         try {
             $data = DoublePacker::pack($microtime);
-            if (! $this->redis->set($this->key, $data)) {
+            if ($this->redis->set($this->key, $data) instanceof ErrorInterface) {
                 throw new StorageException('Failed to store microtime');
             }
         } catch (PredisException $e) {
@@ -79,13 +80,13 @@ final class PredisStorage implements Storage, GlobalScope
     }
 
     /**
-     * @SuppressWarnings(PHPMD)
+     * @throws StorageException
      */
-    public function getMicrotime()
+    public function getMicrotime(): float
     {
         try {
             $data = $this->redis->get($this->key);
-            if ($data === false) {
+            if ($data === null) {
                 throw new StorageException('Failed to get microtime');
             }
             return DoublePacker::unpack($data);
@@ -94,12 +95,12 @@ final class PredisStorage implements Storage, GlobalScope
         }
     }
 
-    public function getMutex()
+    public function getMutex(): Mutex
     {
         return $this->mutex;
     }
 
-    public function letMicrotimeUnchanged()
+    public function letMicrotimeUnchanged(): void
     {
     }
 }

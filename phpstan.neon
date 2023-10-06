@@ -12,9 +12,8 @@ parameters:
     # this generally is "src" and "tests"
     paths:
         - src/
-        - tests/
 
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
 
     # Start with level 5 and gradually up this. target should be level 8 at least
-    level: 5
+    level: max

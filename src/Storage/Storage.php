@@ -29,7 +29,7 @@ interface Storage
      * @return Mutex The mutex.
      * @internal
      */
-    public function getMutex();
+    public function getMutex(): Mutex;
 
     /**
      * Returns if the Storage was already bootstrapped.
@@ -37,15 +37,15 @@ interface Storage
      * @return bool True if the Storage was already bootstrapped.
      * @internal
      */
-    public function isBootstrapped();
+    public function isBootstrapped(): bool;
 
     /**
      * Bootstraps the Storage.
      *
-     * @param double $microtime The timestamp.
+     * @param float $microtime The timestamp.
      * @internal
      */
-    public function bootstrap($microtime);
+    public function bootstrap(float $microtime): void;
 
     /**
      * Removes the Storage.
@@ -57,28 +57,28 @@ interface Storage
      *
      * @internal
      */
-    public function remove();
+    public function remove(): void;
 
     /**
      * Stores a timestamp.
      *
-     * @param double $microtime The timestamp.
+     * @param float $microtime The timestamp.
      * @internal
      */
-    public function setMicrotime($microtime);
+    public function setMicrotime(float $microtime): void;
 
     /**
      * Indicates, that there won't be any change within this transaction.
      *
      * @internal
      */
-    public function letMicrotimeUnchanged();
+    public function letMicrotimeUnchanged(): void;
 
     /**
      * Returns the stored timestamp.
      *
-     * @return double The timestamp.
+     * @return float The timestamp.
      * @internal
      */
-    public function getMicrotime();
+    public function getMicrotime(): float;
 }

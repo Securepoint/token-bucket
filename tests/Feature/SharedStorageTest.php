@@ -35,13 +35,16 @@ use Securepoint\TokenBucket\Storage\StorageException;
  */
 class SharedStorageTest extends TestCase
 {
+    /**
+     * @var callable[][]
+     */
     private array $storages = [];
 
     protected function tearDown(): void
     {
         foreach ($this->storages as $storage) {
             try {
-                @$storage->remove();
+                $storage->remove();
             } catch (StorageException) {
                 // ignore missing vfsStream files.
             }
@@ -53,7 +56,7 @@ class SharedStorageTest extends TestCase
      *
      * @return callable[][] Storage factories.
      */
-    public static function provideStorageFactories()
+    public static function provideStorageFactories(): array
     {
         $cases = [
             [
@@ -121,7 +124,7 @@ class SharedStorageTest extends TestCase
      * @param callable $factory The Storage factory.
      */
     #[DataProvider('provideStorageFactories')]
-    public function testStoragesDontInterfere(callable $factory)
+    public function testStoragesDontInterfere(callable $factory): void
     {
         $storageA = call_user_func($factory, 'A');
         $storageA->bootstrap(0);
