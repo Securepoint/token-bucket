@@ -13,7 +13,6 @@ use Predis\Client;
 use Redis;
 use Securepoint\TokenBucket\Rate;
 use Securepoint\TokenBucket\Storage\FileStorage;
-use Securepoint\TokenBucket\Storage\IPCStorage;
 use Securepoint\TokenBucket\Storage\MemcachedStorage;
 use Securepoint\TokenBucket\Storage\PDOStorage;
 use Securepoint\TokenBucket\Storage\PHPRedisStorage;
@@ -21,6 +20,7 @@ use Securepoint\TokenBucket\Storage\PredisStorage;
 use Securepoint\TokenBucket\Storage\SessionStorage;
 use Securepoint\TokenBucket\Storage\SingleProcessStorage;
 use Securepoint\TokenBucket\Storage\Storage;
+use Securepoint\TokenBucket\Storage\StorageException;
 use Securepoint\TokenBucket\TokenBucket;
 
 /**
@@ -42,11 +42,11 @@ class StorageTest extends TestCase
     /**
      * @var Storage The tested storage;
      */
-    private $storage;
+    private Storage $storage;
 
     protected function tearDown(): void
     {
-        if ($this->storage !== null && $this->storage->isBootstrapped()) {
+        if ($this->storage->isBootstrapped()) {
             $this->storage->remove();
         }
     }
@@ -56,7 +56,7 @@ class StorageTest extends TestCase
      *
      * @return callable[][] Storage factories.
      */
-    public static function provideStorageFactories()
+    public static function provideStorageFactories(): array
     {
         $cases = [
             'SingleProcessStorage' => [
@@ -74,9 +74,6 @@ class StorageTest extends TestCase
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 return new PDOStorage('test', $pdo);
             }],
-            'IPCStorage' => [
-                fn () => new IPCStorage(ftok(__FILE__, 'a')),
-            ],
         ];
 
         if (getenv('MYSQL_DSN')) {
@@ -123,7 +120,7 @@ class StorageTest extends TestCase
      * @param callable $storageFactory Returns a storage.
      */
     #[DataProvider('provideStorageFactories')]
-    public function testSetAndGetMicrotime(callable $storageFactory)
+    public function testSetAndGetMicrotime(callable $storageFactory): void
     {
         $this->storage = call_user_func($storageFactory);
         $this->storage->bootstrap(1);
@@ -146,7 +143,7 @@ class StorageTest extends TestCase
      * @param callable $storageFactory Returns a storage.
      */
     #[DataProvider('provideStorageFactories')]
-    public function testBootstrap(callable $storageFactory)
+    public function testBootstrap(callable $storageFactory): void
     {
         $this->storage = call_user_func($storageFactory);
 
@@ -161,7 +158,7 @@ class StorageTest extends TestCase
      * @param callable $storageFactory Returns a storage.
      */
     #[DataProvider('provideStorageFactories')]
-    public function testIsBootstrapped(callable $storageFactory)
+    public function testIsBootstrapped(callable $storageFactory): void
     {
         $this->storage = call_user_func($storageFactory);
         $this->assertFalse($this->storage->isBootstrapped());
@@ -179,7 +176,7 @@ class StorageTest extends TestCase
      * @param callable $storageFactory Returns a storage.
      */
     #[DataProvider('provideStorageFactories')]
-    public function testRemove(callable $storageFactory)
+    public function testRemove(callable $storageFactory): void
     {
         $this->storage = call_user_func($storageFactory);
         $this->storage->bootstrap(123);
@@ -192,9 +189,10 @@ class StorageTest extends TestCase
      * When no tokens are available, the bucket should return false.
      *
      * @param callable $storageFactory Returns a storage.
+     * @throws StorageException
      */
     #[DataProvider('provideStorageFactories')]
-    public function testConsumingUnavailableTokensReturnsFalse(callable $storageFactory)
+    public function testConsumingUnavailableTokensReturnsFalse(callable $storageFactory): void
     {
         $this->storage = call_user_func($storageFactory);
         $capacity = 10;
@@ -209,9 +207,10 @@ class StorageTest extends TestCase
      * When tokens are available, the bucket should return true.
      *
      * @param callable $storageFactory Returns a storage.
+     * @throws StorageException
      */
     #[DataProvider('provideStorageFactories')]
-    public function testConsumingAvailableTokensReturnsTrue(callable $storageFactory)
+    public function testConsumingAvailableTokensReturnsTrue(callable $storageFactory): void
     {
         $this->storage = call_user_func($storageFactory);
         $capacity = 10;
@@ -226,9 +225,10 @@ class StorageTest extends TestCase
      * Tests synchronized bootstrap
      *
      * @param callable $storageFactory Returns a storage.
+     * @throws \Exception
      */
     #[DataProvider('provideStorageFactories')]
-    public function testSynchronizedBootstrap(callable $storageFactory)
+    public function testSynchronizedBootstrap(callable $storageFactory): void
     {
         $this->storage = call_user_func($storageFactory);
         $this->storage->getMutex()

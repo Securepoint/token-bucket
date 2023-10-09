@@ -34,8 +34,6 @@
         "ext-pdo": "*",
         "ext-memcached": "*",
         "ext-redis": "*",
-        "ext-sysvshm": "*",
-        "ext-sysvsem": "*",
         "predis/predis": "^2.2",
         "phpunit/phpunit": "10.2.7",
         "mikey179/vfsstream": "^1.6",
@@ -50,8 +48,6 @@
         "ext-pdo": "Requried to use the PDOStorage.",
         "ext-redis": "Required to use the PHPRedisStorage.",
         "ext-memcached": "Required to use the MemcachedStorage.",
-        "ext-sysvsem": "Required to use the IPCStorage.",
-        "ext-sysvshm": "Required to use the IPCStorage.",
         "predis/predis": "Required to use the PredisStorage (^2.2)."
     },
     "archive": {

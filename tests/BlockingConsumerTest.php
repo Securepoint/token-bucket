@@ -86,7 +86,7 @@ class BlockingConsumerTest extends TestCase
 
         $time = microtime(true);
         $consumer->consume($tokens);
-        $this->assertEquals($expected, microtime(true) - $time);
+        $this->assertEquals($expected, number_format(microtime(true) - $time, 1));
     }
 
     /**

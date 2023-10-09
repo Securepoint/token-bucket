@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Predis\Client;
 use Predis\ClientException;
+use Predis\Response\Error;
 use Securepoint\TokenBucket\Storage\PredisStorage;
 use Securepoint\TokenBucket\Storage\StorageException;
 
@@ -48,7 +49,7 @@ class PredisStorageTest extends TestCase
      * @param callable $method The tested method.
      */
     #[DataProvider('provideTestBrokenCommunication')]
-    public function testBrokenCommunication(callable $method)
+    public function testBrokenCommunication(callable $method): void
     {
         $this->expectException(StorageException::class);
         $redis = $this->createMock(Client::class);
@@ -62,9 +63,9 @@ class PredisStorageTest extends TestCase
     /**
      * Provides test cases for testBrokenCommunication().
      *
-     * @return array Testcases.
+     * @return array<int,array<callable>> Testcases.
      */
-    public static function provideTestBrokenCommunication()
+    public static function provideTestBrokenCommunication(): array
     {
         return [
             [function (PredisStorage $storage) {
@@ -88,7 +89,7 @@ class PredisStorageTest extends TestCase
     /**
      * Tests remove() fails.
      */
-    public function testRemoveFails()
+    public function testRemoveFails(): void
     {
         $this->expectException(StorageException::class);
         $this->storage->bootstrap(1);
@@ -100,14 +101,14 @@ class PredisStorageTest extends TestCase
     /**
      * Tests setMicrotime() fails.
      */
-    public function testSetMicrotimeFails()
+    public function testSetMicrotimeFails(): void
     {
         $this->expectException(StorageException::class);
         $redis = $this->createMock(Client::class);
         $redis->expects($this->once())
             ->method('__call')
             ->with('set')
-            ->willReturn(false);
+            ->willReturn(new Error('error'));
         $storage = new PredisStorage('test', $redis);
         $storage->setMicrotime(1);
     }
@@ -115,7 +116,7 @@ class PredisStorageTest extends TestCase
     /**
      * Tests getMicrotime() fails.
      */
-    public function testGetMicrotimeFails()
+    public function testGetMicrotimeFails(): void
     {
         $this->expectException(StorageException::class);
         $this->storage->bootstrap(1);

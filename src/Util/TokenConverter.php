@@ -32,10 +32,10 @@ final class TokenConverter
     /**
      * Converts a duration of seconds into an amount of tokens.
      *
-     * @param double|string $seconds The duration in seconds.
+     * @param float $seconds The duration in seconds.
      * @return int The amount of tokens.
      */
-    public function convertSecondsToTokens($seconds)
+    public function convertSecondsToTokens(float $seconds): int
     {
         return (int) ($seconds * $this->rate->getTokensPerSecond());
     }
@@ -46,7 +46,7 @@ final class TokenConverter
      * @param int $tokens The amount of tokens.
      * @return double The seconds.
      */
-    public function convertTokensToSeconds($tokens)
+    public function convertTokensToSeconds(int $tokens): float
     {
         return $tokens / $this->rate->getTokensPerSecond();
     }
@@ -55,9 +55,9 @@ final class TokenConverter
      * Converts an amount of tokens into a timestamp.
      *
      * @param int $tokens The amount of tokens.
-     * @return double The timestamp.
+     * @return float The timestamp.
      */
-    public function convertTokensToMicrotime($tokens)
+    public function convertTokensToMicrotime(int $tokens): float
     {
         return microtime(true) - $this->convertTokensToSeconds($tokens);
     }
@@ -65,13 +65,13 @@ final class TokenConverter
     /**
      * Converts a timestamp into tokens.
      *
-     * @param double $microtime The timestamp.
+     * @param float $microtime The timestamp.
      *
      * @return int The tokens.
      */
-    public function convertMicrotimeToTokens($microtime)
+    public function convertMicrotimeToTokens(float $microtime): int
     {
-        $delta = bcsub((string) microtime(true), (string) $microtime, $this->bcScale);
+        $delta = floatval(bcsub((string) microtime(true), (string) $microtime, $this->bcScale));
         return $this->convertSecondsToTokens($delta);
     }
 }

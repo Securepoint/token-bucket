@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Securepoint\TokenBucket\Storage;
 
 use malkusch\lock\mutex\CASMutex;
+use malkusch\lock\mutex\Mutex;
 use Memcached;
 use Securepoint\TokenBucket\Storage\Scope\GlobalScope;
 
@@ -47,14 +48,14 @@ final class MemcachedStorage implements Storage, GlobalScope
      * @param Memcached $memcached The memcached API.
      */
     public function __construct(
-        $name,
+        string $name,
         private readonly Memcached $memcached
     ) {
         $this->key = self::PREFIX . $name;
         $this->mutex = new CASMutex();
     }
 
-    public function bootstrap($microtime)
+    public function bootstrap(float $microtime): void
     {
         if ($this->memcached->add($this->key, $microtime)) {
             $this->mutex->notify(); // [CAS] Stop TokenBucket::bootstrap()
@@ -67,7 +68,7 @@ final class MemcachedStorage implements Storage, GlobalScope
         throw new StorageException($this->memcached->getResultMessage(), $this->memcached->getResultCode());
     }
 
-    public function isBootstrapped()
+    public function isBootstrapped(): bool
     {
         if ($this->memcached->get($this->key) !== false) {
             $this->mutex->notify(); // [CAS] Stop TokenBucket::bootstrap()
@@ -79,14 +80,14 @@ final class MemcachedStorage implements Storage, GlobalScope
         throw new StorageException($this->memcached->getResultMessage(), $this->memcached->getResultCode());
     }
 
-    public function remove()
+    public function remove(): void
     {
         if (! $this->memcached->delete($this->key)) {
             throw new StorageException($this->memcached->getResultMessage(), $this->memcached->getResultCode());
         }
     }
 
-    public function setMicrotime($microtime)
+    public function setMicrotime(float $microtime): void
     {
         if ($this->casToken === null) {
             throw new StorageException('CAS token is null. Call getMicrotime() first.');
@@ -102,7 +103,7 @@ final class MemcachedStorage implements Storage, GlobalScope
         throw new StorageException($this->memcached->getResultMessage(), $this->memcached->getResultCode());
     }
 
-    public function getMicrotime()
+    public function getMicrotime(): float
     {
         $getDelayed = $this->memcached->getDelayed([$this->key], true);
         if (! $getDelayed) {
@@ -123,12 +124,12 @@ final class MemcachedStorage implements Storage, GlobalScope
         return (float) $microtime;
     }
 
-    public function getMutex()
+    public function getMutex(): Mutex
     {
         return $this->mutex;
     }
 
-    public function letMicrotimeUnchanged()
+    public function letMicrotimeUnchanged(): void
     {
         $this->mutex->notify();
     }

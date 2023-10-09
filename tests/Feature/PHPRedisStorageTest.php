@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Securepoint\TokenBucket\Tests\Feature;
 
+use Closure;
+use Exception;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Redis;
+use RedisException;
 use Securepoint\TokenBucket\Storage\PHPRedisStorage;
 use Securepoint\TokenBucket\Storage\StorageException;
 
@@ -32,11 +35,10 @@ class PHPRedisStorageTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (! getenv('REDIS_URI')) {
-            $this->markTestSkipped();
+            throw new Exception('Define REDIS_URI env var!');
         }
+        /** @var array{"scheme": string, "host": string, "port":int, "user": string, "pass": string, "query": string, "path": string, "fragment": string} $uri */
         $uri = parse_url(getenv('REDIS_URI'));
         $this->redis = new Redis();
         $this->redis->connect($uri['host']);
@@ -48,21 +50,35 @@ class PHPRedisStorageTest extends TestCase
      * Tests broken server communication.
      *
      * @param callable $method The tested method.
+     * @throws RedisException
      */
     #[DataProvider('provideTestBrokenCommunication')]
-    public function testBrokenCommunication(callable $method)
+    public function testBrokenCommunication(callable $method): void
     {
+        if (! getenv('REDIS_URI')) {
+            throw new Exception('Define REDIS_URI env var!');
+        }
+        /** @var array{"scheme": string, "host": string, "port":int, "user": string, "pass": string, "query": string, "path": string, "fragment": string} $uri */
+        $uri = parse_url(getenv('REDIS_URI'));
+        $redis = new Redis();
+        try {
+            $redis->setOption(Redis::OPT_MAX_RETRIES, 0);
+            $redis->connect($uri['host']);
+        } catch (RedisException) {
+        }
+        $storage = new PHPRedisStorage('test', $redis);
+
         $this->expectException(StorageException::class);
         $this->redis->close();
-        call_user_func($method, $this->storage);
+        call_user_func($method, $storage);
     }
 
     /**
      * Provides test cases for testBrokenCommunication().
      *
-     * @return array Testcases.
+     * @return array<array<Closure>> Testcases.
      */
-    public static function provideTestBrokenCommunication()
+    public static function provideTestBrokenCommunication(): array
     {
         return [
             [function (PHPRedisStorage $storage) {
@@ -86,7 +102,7 @@ class PHPRedisStorageTest extends TestCase
     /**
      * Tests remove() fails.
      */
-    public function testRemoveFails()
+    public function testRemoveFails(): void
     {
         $this->expectException(StorageException::class);
         $this->storage->bootstrap(1);
@@ -98,13 +114,13 @@ class PHPRedisStorageTest extends TestCase
     /**
      * Tests setMicrotime() fails.
      */
-    public function testSetMicrotimeFails()
+    public function testSetMicrotimeFails(): void
     {
         $this->expectException(StorageException::class);
         $redis = $this->createMock(Redis::class);
         $redis->expects($this->once())
             ->method('set')
-            ->willReturn(false);
+            ->willThrowException(new RedisException('error'));
         $storage = new PHPRedisStorage('test', $redis);
         $storage->setMicrotime(1);
     }
@@ -112,7 +128,7 @@ class PHPRedisStorageTest extends TestCase
     /**
      * Tests getMicrotime() fails.
      */
-    public function testGetMicrotimeFails()
+    public function testGetMicrotimeFails(): void
     {
         $this->expectException(StorageException::class);
         $this->storage->bootstrap(1);

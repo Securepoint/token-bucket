@@ -37,27 +37,30 @@ final class PHPRedisStorage implements Storage, GlobalScope
      * @param Redis  $redis The Redis API.
      */
     public function __construct(
-        private $key,
+        private readonly string $key,
         private readonly Redis $redis
     ) {
         $this->mutex = new PHPRedisMutex([$redis], $key);
     }
 
-    public function bootstrap($microtime)
+    /**
+     * @throws StorageException
+     */
+    public function bootstrap(float $microtime): void
     {
         $this->setMicrotime($microtime);
     }
 
-    public function isBootstrapped(): bool|int
+    public function isBootstrapped(): bool
     {
         try {
-            return $this->redis->exists($this->key);
+            return $this->redis->exists($this->key) === 1;
         } catch (RedisException $e) {
             throw new StorageException('Failed to check for key existence', 0, $e);
         }
     }
 
-    public function remove()
+    public function remove(): void
     {
         try {
             if (! $this->redis->del($this->key)) {
@@ -71,12 +74,12 @@ final class PHPRedisStorage implements Storage, GlobalScope
     /**
      * @SuppressWarnings(PHPMD)
      */
-    public function setMicrotime($microtime)
+    public function setMicrotime(float $microtime): void
     {
         try {
             $data = DoublePacker::pack($microtime);
 
-            if (! $this->redis->set($this->key, $data)) {
+            if ($this->redis->set($this->key, $data) !== true) {
                 throw new StorageException('Failed to store microtime');
             }
         } catch (RedisException $e) {
@@ -87,7 +90,7 @@ final class PHPRedisStorage implements Storage, GlobalScope
     /**
      * @SuppressWarnings(PHPMD)
      */
-    public function getMicrotime()
+    public function getMicrotime(): float
     {
         try {
             $data = $this->redis->get($this->key);
@@ -100,12 +103,12 @@ final class PHPRedisStorage implements Storage, GlobalScope
         }
     }
 
-    public function getMutex()
+    public function getMutex(): Mutex
     {
         return $this->mutex;
     }
 
-    public function letMicrotimeUnchanged()
+    public function letMicrotimeUnchanged(): void
     {
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Securepoint\TokenBucket\Tests\Feature;
 
+use Exception;
 use Memcached;
 use PHPUnit\Framework\TestCase;
 use Securepoint\TokenBucket\Storage\MemcachedStorage;
@@ -34,7 +35,7 @@ class MemcachedStorageTest extends TestCase
         parent::setUp();
 
         if (! getenv('MEMCACHE_HOST')) {
-            $this->markTestSkipped();
+            throw new Exception('Define memcache host!');
         }
         $this->memcached = new Memcached();
         $this->memcached->addServer(getenv('MEMCACHE_HOST'), 11211);
@@ -48,7 +49,7 @@ class MemcachedStorageTest extends TestCase
         parent::tearDown();
 
         if (! getenv('MEMCACHE_HOST')) {
-            return;
+            throw new Exception('Define memcache host!');
         }
         $memcached = new Memcached();
         $memcached->addServer(getenv('MEMCACHE_HOST'), 11211);
@@ -58,15 +59,16 @@ class MemcachedStorageTest extends TestCase
     /**
      * Tests bootstrap() returns silenty if the key exists already.
      */
-    public function testBootstrapReturnsSilentlyIfKeyExists()
+    public function testBootstrapReturnsSilentlyIfKeyExists(): void
     {
+        $this->expectNotToPerformAssertions();
         $this->storage->bootstrap(234);
     }
 
     /**
      * Tests bootstrap() fails.
      */
-    public function testBootstrapFails()
+    public function testBootstrapFails(): void
     {
         $this->expectException(StorageException::class);
         $storage = new MemcachedStorage('test', new Memcached());
@@ -76,16 +78,21 @@ class MemcachedStorageTest extends TestCase
     /**
      * Tests isBootstrapped() fails
      */
-    public function testIsBootstrappedFails(): never
+    public function testIsBootstrappedFails(): void
     {
         $this->expectException(StorageException::class);
-        $this->markTestIncomplete();
+        $memcached = new Memcached();
+        $memcached->addServer(getenv('MEMCACHE_HOST'), 11211);
+        $storage = new MemcachedStorage('test', new Memcached());
+        $storage->bootstrap(123);
+        $storage->remove();
+        $storage->isBootstrapped();
     }
 
     /**
      * Tests remove() fails
      */
-    public function testRemoveFails()
+    public function testRemoveFails(): void
     {
         $this->expectException(StorageException::class);
         $storage = new MemcachedStorage('test', new Memcached());
@@ -95,7 +102,7 @@ class MemcachedStorageTest extends TestCase
     /**
      * Tests setMicrotime() fails if getMicrotime() wasn't called first.
      */
-    public function testSetMicrotimeFailsIfGetMicrotimeNotCalledFirst()
+    public function testSetMicrotimeFailsIfGetMicrotimeNotCalledFirst(): void
     {
         $this->expectException(StorageException::class);
         $this->storage->setMicrotime(123);
@@ -104,7 +111,7 @@ class MemcachedStorageTest extends TestCase
     /**
      * Tests setMicrotime() fails.
      */
-    public function testSetMicrotimeFails()
+    public function testSetMicrotimeFails(): void
     {
         $this->expectException(StorageException::class);
         $this->storage->getMicrotime();
@@ -114,9 +121,12 @@ class MemcachedStorageTest extends TestCase
 
     /**
      * Tests setMicrotime() returns silenty if the cas operation failed.
+     * @throws StorageException
      */
-    public function testSetMicrotimeReturnsSilentlyIfCASFailed()
+    public function testSetMicrotimeReturnsSilentlyIfCASFailed(): void
     {
+        $this->expectNotToPerformAssertions();
+
         // acquire cas token
         $this->storage->getMicrotime();
 
@@ -131,7 +141,7 @@ class MemcachedStorageTest extends TestCase
     /**
      * Tests getMicrotime() fails.
      */
-    public function testGetMicrotimeFails()
+    public function testGetMicrotimeFails(): void
     {
         $this->expectException(StorageException::class);
         $storage = new MemcachedStorage('test', new Memcached());

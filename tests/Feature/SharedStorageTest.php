@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 use Predis\Client;
 use Redis;
 use Securepoint\TokenBucket\Storage\FileStorage;
-use Securepoint\TokenBucket\Storage\IPCStorage;
 use Securepoint\TokenBucket\Storage\MemcachedStorage;
 use Securepoint\TokenBucket\Storage\PDOStorage;
 use Securepoint\TokenBucket\Storage\PHPRedisStorage;
@@ -36,13 +35,16 @@ use Securepoint\TokenBucket\Storage\StorageException;
  */
 class SharedStorageTest extends TestCase
 {
+    /**
+     * @var callable[][]
+     */
     private array $storages = [];
 
     protected function tearDown(): void
     {
         foreach ($this->storages as $storage) {
             try {
-                @$storage->remove();
+                $storage->remove();
             } catch (StorageException) {
                 // ignore missing vfsStream files.
             }
@@ -54,7 +56,7 @@ class SharedStorageTest extends TestCase
      *
      * @return callable[][] Storage factories.
      */
-    public static function provideStorageFactories()
+    public static function provideStorageFactories(): array
     {
         $cases = [
             [
@@ -64,11 +66,6 @@ class SharedStorageTest extends TestCase
             [function ($name) {
                 vfsStream::setup('fileStorage');
                 return new FileStorage(vfsStream::url("fileStorage/{$name}"));
-            }],
-
-            [function ($name) {
-                $key = ftok(__FILE__, $name);
-                return new IPCStorage($key);
             }],
 
             [function ($name) {
@@ -127,7 +124,7 @@ class SharedStorageTest extends TestCase
      * @param callable $factory The Storage factory.
      */
     #[DataProvider('provideStorageFactories')]
-    public function testStoragesDontInterfere(callable $factory)
+    public function testStoragesDontInterfere(callable $factory): void
     {
         $storageA = call_user_func($factory, 'A');
         $storageA->bootstrap(0);

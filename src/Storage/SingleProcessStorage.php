@@ -26,7 +26,7 @@ final class SingleProcessStorage implements Storage, RequestScope
     /**
      * @var double|null The microtime.
      */
-    private $microtime;
+    private ?float $microtime = null;
 
     /**
      * Initialization.
@@ -36,37 +36,37 @@ final class SingleProcessStorage implements Storage, RequestScope
         $this->mutex = new NoMutex();
     }
 
-    public function isBootstrapped()
+    public function isBootstrapped(): bool
     {
         return $this->microtime !== null;
     }
 
-    public function bootstrap($microtime)
+    public function bootstrap(float $microtime): void
     {
         $this->setMicrotime($microtime);
     }
 
-    public function remove()
+    public function remove(): void
     {
         $this->microtime = null;
     }
 
-    public function setMicrotime($microtime)
+    public function setMicrotime(float $microtime): void
     {
         $this->microtime = $microtime;
     }
 
-    public function getMicrotime()
+    public function getMicrotime(): float
     {
-        return $this->microtime;
+        return $this->microtime ?? 0;
     }
 
-    public function getMutex()
+    public function getMutex(): Mutex
     {
         return $this->mutex;
     }
 
-    public function letMicrotimeUnchanged()
+    public function letMicrotimeUnchanged(): void
     {
     }
 }

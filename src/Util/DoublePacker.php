@@ -20,7 +20,7 @@ final class DoublePacker
      * @param double $double 64 bit double
      * @return string packed 8 byte string representation
      */
-    public static function pack($double)
+    public static function pack(float $double): string
     {
         $string = pack('d', $double);
         assert(strlen($string) === 8);
@@ -31,9 +31,10 @@ final class DoublePacker
      * Unpacks a 64 bit double from an 8 byte string.
      *
      * @param string $string packed 8 byte string representation.
-     * @return double unpacked 64 bit double
+     * @return float unpacked 64 bit double
+     * @throws StorageException
      */
-    public static function unpack($string)
+    public static function unpack(string $string): float
     {
         if (strlen($string) !== 8) {
             throw new StorageException('The string is not 64 bit long.');
@@ -42,6 +43,7 @@ final class DoublePacker
         if (! is_array($unpack) || ! array_key_exists(1, $unpack)) {
             throw new StorageException('Could not unpack string.');
         }
+        /** @var float */
         return $unpack[1];
     }
 }
